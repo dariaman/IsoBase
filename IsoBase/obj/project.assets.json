@@ -2,6 +2,19 @@
   "version": 3,
   "targets": {
     ".NETCoreApp,Version=v2.2": {
+      "DataTables.AspNetCore.Mvc/1.4.1": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.AspNetCore.Mvc.Razor": "2.0.0",
+          "Microsoft.AspNetCore.Mvc.ViewFeatures": "2.0.0"
+        },
+        "compile": {
+          "lib/netstandard2.0/DataTables.AspNetCore.Mvc.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard2.0/DataTables.AspNetCore.Mvc.dll": {}
+        }
+      },
       "Microsoft.AspNet.WebApi.Client/5.2.6": {
         "type": "package",
         "dependencies": {
@@ -4724,6 +4737,19 @@
     }
   },
   "libraries": {
+    "DataTables.AspNetCore.Mvc/1.4.1": {
+      "sha512": "KppMtAEenoEkeETxftiDeeipJUIB1i3vP2nhcUQ/FYH6hYNt09zcNuDqFeK6NBzC7N94vLvA7aQSNDxMeGolZg==",
+      "type": "package",
+      "path": "datatables.aspnetcore.mvc/1.4.1",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "datatables.aspnetcore.mvc.1.4.1.nupkg.sha512",
+        "datatables.aspnetcore.mvc.nuspec",
+        "lib/netstandard2.0/DataTables.AspNetCore.Mvc.dll",
+        "lib/netstandard2.0/DataTables.AspNetCore.Mvc.xml"
+      ]
+    },
     "Microsoft.AspNet.WebApi.Client/5.2.6": {
       "sha512": "owAlEIUZXWSnkK8Z1c+zR47A0X6ykF4XjbPok4lQKNuciUfHLGPd6QnI+rt/8KlQ17PmF+I4S3f+m+Qe4IvViw==",
       "type": "package",
@@ -12948,6 +12974,7 @@
   },
   "projectFileDependencyGroups": {
     ".NETCoreApp,Version=v2.2": [
+      "DataTables.AspNetCore.Mvc >= 1.4.1",
       "Microsoft.AspNetCore.App >= 2.2.0",
       "Microsoft.AspNetCore.Razor.Design >= 2.2.0",
       "Microsoft.NETCore.App >= 2.2.0",
@@ -12997,6 +13024,10 @@
     "frameworks": {
       "netcoreapp2.2": {
         "dependencies": {
+          "DataTables.AspNetCore.Mvc": {
+            "target": "Package",
+            "version": "[1.4.1, )"
+          },
           "Microsoft.AspNetCore.App": {
             "suppressParent": "All",
             "target": "Package",

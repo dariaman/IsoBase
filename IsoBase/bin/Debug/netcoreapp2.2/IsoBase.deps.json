@@ -24,6 +24,7 @@
     ".NETCoreApp,Version=v2.2": {
       "IsoBase/1.0.0": {
         "dependencies": {
+          "DataTables.AspNetCore.Mvc": "1.4.1",
           "Microsoft.AspNetCore.App": "2.2.0",
           "Microsoft.AspNetCore.Razor.Design": "2.2.0",
           "Microsoft.NETCore.App": "2.2.0",
@@ -34,6 +35,21 @@
         },
         "compile": {
           "IsoBase.dll": {}
+        }
+      },
+      "DataTables.AspNetCore.Mvc/1.4.1": {
+        "dependencies": {
+          "Microsoft.AspNetCore.Mvc.Razor": "2.2.0",
+          "Microsoft.AspNetCore.Mvc.ViewFeatures": "2.2.0"
+        },
+        "runtime": {
+          "lib/netstandard2.0/DataTables.AspNetCore.Mvc.dll": {
+            "assemblyVersion": "1.4.1.0",
+            "fileVersion": "1.4.1.0"
+          }
+        },
+        "compile": {
+          "lib/netstandard2.0/DataTables.AspNetCore.Mvc.dll": {}
         }
       },
       "Microsoft.CodeAnalysis.CSharp.Workspaces/2.8.0": {
@@ -3543,6 +3559,13 @@
       "type": "project",
       "serviceable": false,
       "sha512": ""
+    },
+    "DataTables.AspNetCore.Mvc/1.4.1": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-KppMtAEenoEkeETxftiDeeipJUIB1i3vP2nhcUQ/FYH6hYNt09zcNuDqFeK6NBzC7N94vLvA7aQSNDxMeGolZg==",
+      "path": "datatables.aspnetcore.mvc/1.4.1",
+      "hashPath": "datatables.aspnetcore.mvc.1.4.1.nupkg.sha512"
     },
     "Microsoft.CodeAnalysis.CSharp.Workspaces/2.8.0": {
       "type": "package",
