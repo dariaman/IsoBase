@@ -1,3 +1,4 @@
 /.vs
 /IsoBase/bin
 /IsoBase/obj
+*.dll

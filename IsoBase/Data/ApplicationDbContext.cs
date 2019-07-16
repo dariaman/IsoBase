@@ -14,9 +14,12 @@ namespace IsoBase.Data
         {
         }
 
+        public DbSet<IsoBase.Models.ClientMasterModel> ClientMasterModel { get; set; }
+        public DbSet<IsoBase.Models.ClientTypeModel> ClientTypeModel { get; set; }
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
-            builder.Entity<ClientMasterModels>(b => {
+            builder.Entity<ClientMasterModel>(b => {
                 b.HasKey(u => u.ClientID);
                 b.Property(u => u.IsActive).HasDefaultValueSql("1");
                 b.Property(u => u.DateCreate).HasDefaultValueSql("getdate()");
@@ -28,8 +31,5 @@ namespace IsoBase.Data
             });
             base.OnModelCreating(builder);
         }
-
-        public DbSet<IsoBase.Models.ClientMasterModels> ClientMasterModels { get; set; }
-        public DbSet<IsoBase.Models.ClientTypeModel> ClientTypeModel { get; set; }
     }
 }

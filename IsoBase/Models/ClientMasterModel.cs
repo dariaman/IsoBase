@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace IsoBase.Models
 {
     [Table("ClientMaster")]
-    public class ClientMasterModels
+    public class ClientMasterModel
     {
         [Key]
         public int ClientID { get; set; }
