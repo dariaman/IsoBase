@@ -12,8 +12,11 @@
           asp-fallback-test-class="sr-only" asp-fallback-test-property="position" asp-fallback-test-value="absolute"
           crossorigin="anonymous"
           integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" />
+    @*<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/dataTables.bootstrap4.min.css">*@
+
+    <link rel="stylesheet" type="text/css" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/dataTables.jqueryui.min.css">
     <link rel="stylesheet" href="~/css/site.css" />
-    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/dataTables.bootstrap4.min.css">
 
     @*======================================================JAVASCRIPT========================================================*@
 
@@ -31,7 +34,9 @@
     </script>
 
     <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/1.10.19/js/dataTables.bootstrap4.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.19/js/dataTables.jqueryui.min.js"></script>
+
+    @*<script src="https://cdn.datatables.net/1.10.19/js/dataTables.bootstrap4.min.js"></script>*@
 
 </head>
 <body>
@@ -69,11 +74,11 @@
             </div>
         </nav>
     </header>
-    <div class="container">
+    <div style="padding-left:20px;min-width:80%;">
         <partial name="_CookieConsentPartial" />
-        <main role="main" class="pb-3">
+        <center><h3>@ViewData["Title"]</h3></center>
+
             @RenderBody()
-        </main>
     </div>
 
     <footer class="border-top footer text-muted">

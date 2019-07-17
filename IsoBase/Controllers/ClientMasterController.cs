@@ -33,8 +33,8 @@ namespace IsoBase.Controllers
 
 
         [HttpPost]
-        //[ValidateAntiForgeryToken]
-        public IActionResult PageData([DataTablesRequest] DataTablesRequest dataRequest)
+        [ValidateAntiForgeryToken]
+        public IActionResult ListClientAll([DataTablesRequest] DataTablesRequest dataRequest)
         {
             IEnumerable<ClientMasterModel> products = _context.ClientMasterModel.Skip(dataRequest.Start).Take(dataRequest.Length);
             int recordsTotal = 2000; // _context.Tabel1Model.Count();

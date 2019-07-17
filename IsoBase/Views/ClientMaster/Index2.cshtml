@@ -1,15 +1,14 @@
 ﻿
 @{
-    ViewData["Title"] = "Index2";
+    ViewData["Title"] = "Client Master";
 }
 
 @inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Xsrf
 @functions{ public string GetAntiXsrfRequestToken() { return Xsrf.GetAndStoreTokens(Context).RequestToken; }}
 
-<h1>Index2</h1>
 
-<table id="myTable" class="stripe">
-    <thead>
+<table id="myTable" class="display cell-border">
+    <thead class="ui-widget-header">
         <tr>
             <th>ClientID</th>
             <th>ClientCode</th>
@@ -37,9 +36,10 @@
 
 <script src="~/js/site.js"></script>
 <script>
-     
+
     $(document).ready(function () {
         $('#myTable').dataTable({
+            "jQueryUI": true,
             serverSide: true,
             processing: true,
             initComplete: function () {
@@ -49,13 +49,13 @@
             },
             dom: '<"top"B>tr<"bottom"ip>',
             "ajax": $.fn.dataTable.pipeline( {
-                "url": "@Url.Action("PageData")",
+                "url": "@Url.Action("ListClientAll")",
                 data: { 
                      __RequestVerificationToken: '@GetAntiXsrfRequestToken()',
                 },
                 pages: 5 // number of pages to cache
             } ),
-           
+// ====================================================KONFIG KOLOM DATA==============================================================           
             columns: [
                 { data: "clientID", className: "dt-right" },
                 { data: "clientCode", className: "dt-right" },
@@ -67,6 +67,9 @@
                 { data: "userUpdate" },
                 { data: "dateUpdate" },
             ]
+// ====================================================END CONFIG KOLOM DATA==============================================================
+
+// ====================================================END DATATABLES Config==============================================================
         });
         // DataTable
         var table = $('#myTable').DataTable();
