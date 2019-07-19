@@ -4,6 +4,7 @@ using System.Text;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using IsoBase.Models;
+using IsoBase.ViewModels;
 
 namespace IsoBase.Data
 {
@@ -14,8 +15,8 @@ namespace IsoBase.Data
         {
         }
 
-        public DbSet<IsoBase.Models.ClientMasterModel> ClientMasterModel { get; set; }
-        public DbSet<IsoBase.Models.ClientTypeModel> ClientTypeModel { get; set; }
+        public DbSet<ClientMasterModel> ClientMasterModel { get; set; }
+        public DbSet<ClientTypeModel> ClientTypeModel { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {

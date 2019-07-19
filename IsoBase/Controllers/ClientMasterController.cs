@@ -8,6 +8,9 @@ using Microsoft.EntityFrameworkCore;
 using IsoBase.Data;
 using IsoBase.Models;
 using DataTables.AspNetCore.Mvc.Binder;
+using System.Data;
+using System.Data.SqlClient;
+using IsoBase.ViewModels;
 
 namespace IsoBase.Controllers
 {
@@ -34,35 +37,71 @@ namespace IsoBase.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult ListClientAll([DataTablesRequest] DataTablesRequest dataRequest)
+        public async Task<IActionResult> ListClientAll([DataTablesRequest] DataTablesRequest dataRequest)
         {
-            IEnumerable<ClientMasterModel> products = _context.ClientMasterModel.Skip(dataRequest.Start).Take(dataRequest.Length);
-            int recordsTotal = 2000; // _context.Tabel1Model.Count();
-            //int recordsTotal = products.Count();
-            int recordsFilterd = 1000; // recordsTotal;
+            var pgData = new PageData(dataRequest)
+            {
+                select = @"SELECT cm.ClientID,cm.ClientCode,cm.Name ClientName,cm.ClientTypeID,ct.Name ClientTypeName,
+                            cm.IsActive,cm.DateCreate,cm.UserCreate,ct.DateUpdate,ct.UserUpdate ",
+                Tabel = @" FROM dbo.ClientMaster cm 
+                            INNER JOIN dbo.ClientType ct ON ct.ID = cm.ClientTypeID
+                            WHERE 1=1 ",
+            };
 
-            return Json(products
-                .Select(e => new
-                {
-                    e.ClientID,
-                    e.ClientCode,
-                    e.Name,
-                    e.ClientTypeID,
-                    e.UserCreate,
-                    e.DateCreate,
-                    e.UserUpdate,
-                    e.DateUpdate
-                })
-                .ToDataTablesResponse(dataRequest, recordsTotal, recordsFilterd));
+            //defenisikan Where condition
+            foreach (var req in dataRequest.Columns)
+            {
+                if (string.IsNullOrEmpty(req.SearchValue)) continue;
+                else if (req.Data == "clientID") pgData.AddWhereRegex(pgData.paternAngka, req.SearchValue, "cm.ClientID");
+                else if (req.Data == "clientCode") pgData.AddWhereRegex(pgData.paternAngkaHuruf, req.SearchValue, "cm.ClientCode");
+                else if (req.Data == "clientTypeID") pgData.AddWhereRegex(pgData.paternAngka, req.SearchValue, "cm.ClientTypeID");
+                else if (req.Data == "name") pgData.AddWhereRegex(pgData.paternAngkaHuruf, req.SearchValue, "cm.Name");
+            }
+            var queryString = pgData.GenerateQueryData();
+            //List<ClientListVM> ClientLst = new List<ClientListVM>();
+
+            //using (var dr =  _context.Database.ExecuteSqlCommand(queryString,ClientLst))
+            //{
+
+            //}
+
+            //var ClientLst = _context.Database.SqlQuery<string>.FromSql(query); //.Set<ClientListVM>().FromSql(query);
+            //var lst = _context.Database.ExecuteSqlCommand(query).ToList();
+
+
+            //var ClientLst = _context.Database.ExecuteSqlCommand(queryString);
+            //var myCustomList = _context.Database.SqlQuery<CustomType>("SELECT … FROM …");
+            //var ClientLst = _context.Database.SqlQuery<ClientListVM>(queryString).ToList<ClientListVM>();
+
+            //var myList = await _context.Database.SqlQuery<CustomType>("SELECT … FROM …")
+            //                       .ToListAsync();
+            var ClientLst = _context.Set<ClientListVM>().FromSql(queryString).AsNoTracking().ToList();
+
+            //IEnumerable<ClientMasterModel> products = _context.ClientMasterModel.Skip(dataRequest.Start).Take(dataRequest.Length);
+            //int recordsTotal = 2000; // _context.Tabel1Model.Count();
+            ////int recordsTotal = products.Count();
+            //int recordsFilterd = 1000; // recordsTotal;
+            var a = 1;
+
+            //var psd = products
+            //    .Select(e => new
+            //    {
+            //        e.ClientID,
+            //        e.ClientCode,
+            //        e.Name,
+            //        e.ClientTypeID,
+            //        e.UserCreate,
+            //        e.DateCreate,
+            //        e.UserUpdate,
+            //        e.DateUpdate
+            //    });
+            return Json(ClientLst.ToDataTablesResponse(dataRequest, pgData.recordsTotal, pgData.recordsFilterd));
         }
 
         // GET: ClientMaster/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) { return NotFound(); }
 
             var clientMasterModels = await _context.ClientMasterModel
                 .FirstOrDefaultAsync(m => m.ClientID == id);
