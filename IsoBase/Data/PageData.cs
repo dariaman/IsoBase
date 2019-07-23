@@ -11,12 +11,12 @@ namespace IsoBase.Data
 {
     public class PageData
     {
-        public string paternAngka { get; } = @"[^0-9 ,*]";
-        public string paternHuruf { get; } = @"[^a-zA-Z ,*]";
-        public string paternAngkaHuruf { get; } = @"[^0-9a-zA-Z ,*]";
-        //public string paternAngka = @"[^0-9]";
+        public string paternAngkaLike { get; } = @"[^0-9 ,*]";
+        public string paternHurufLike { get; } = @"[^a-zA-Z ,*]";
+        public string paternAngkaHurufLike { get; } = @"[^0-9a-zA-Z ,*]";
+        public string paternAngka = @"[^0-9]";
         //public string paternHurufLike = @"[^a-zA-Z,%]";
-        //public string paternHuruf = @"[^a-zA-Z]";
+        public string paternHuruf = @"[^a-zA-Z]";
 
         public int RowStart { get; }
         public int RowLength { get; }

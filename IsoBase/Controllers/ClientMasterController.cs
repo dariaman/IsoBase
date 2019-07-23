@@ -43,8 +43,8 @@ namespace IsoBase.Controllers
             {
                 select = @"SELECT cm.ClientID,cm.ClientCode,cm.Name ClientName,cm.ClientTypeID,ct.Name ClientTypeName,
                             cm.IsActive,cm.DateCreate,cm.UserCreate,ct.DateUpdate,ct.UserUpdate ",
-                Tabel = @" FROM dbo.ClientMaster cm 
-                            INNER JOIN dbo.ClientType ct ON ct.ID = cm.ClientTypeID
+                Tabel = @" FROM dbo.ClientMaster cm WITH(NOLOCK)
+                            INNER JOIN dbo.ClientType ct WITH(NOLOCK) ON ct.ID = cm.ClientTypeID
                             WHERE 1=1 ",
             };
 
@@ -52,10 +52,11 @@ namespace IsoBase.Controllers
             foreach (var req in dataRequest.Columns)
             {
                 if (string.IsNullOrEmpty(req.SearchValue)) continue;
-                else if (req.Data == "clientID") pgData.AddWhereRegex(pgData.paternAngka, req.SearchValue, "cm.ClientID");
-                else if (req.Data == "clientCode") pgData.AddWhereRegex(pgData.paternAngkaHuruf, req.SearchValue, "cm.ClientCode");
-                else if (req.Data == "clientTypeID") pgData.AddWhereRegex(pgData.paternAngka, req.SearchValue, "cm.ClientTypeID");
-                else if (req.Data == "clientName") pgData.AddWhereRegex(pgData.paternAngkaHuruf, req.SearchValue, "cm.Name");
+                else if (req.Data == "clientID") pgData.AddWhereRegex(pgData.paternAngkaLike, req.SearchValue, "cm.ClientID");
+                else if (req.Data == "clientCode") pgData.AddWhereRegex(pgData.paternAngkaHurufLike, req.SearchValue, "cm.ClientCode");
+                else if (req.Data == "clientName") pgData.AddWhereRegex(pgData.paternAngkaHurufLike, req.SearchValue, "cm.Name");
+                else if (req.Data == "clientTypeName") pgData.AddWhereRegex(pgData.paternAngka, req.SearchValue, "cm.ClientTypeID");
+                else if (req.Data == "isActive") pgData.AddWhereRegex(pgData.paternAngka, req.SearchValue, "cm.IsActive");
             }
             pgData.CountData(); // hitung jlh total data dan total dataFilter
 

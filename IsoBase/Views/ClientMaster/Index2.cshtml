@@ -14,6 +14,7 @@
             <th>ClientCode</th>
             <th>ClientName</th>
             <th>ClientType</th>
+            <th>IsActive</th>
             <th>UserCreate</th>
             <th>DateCreate</th>
             <th>UserUpdate</th>
@@ -22,6 +23,7 @@
     </thead>
     <tfoot>
         <tr>
+            <th class="search"></th>
             <th class="search"></th>
             <th class="search"></th>
             <th class="search"></th>
@@ -46,6 +48,28 @@
                 var r = $('#myTable tfoot tr');
                 $('#myTable thead').append(r);
                 $('#search_0').css('text-align', 'center');
+
+                this.api().columns([3]).every(function () {
+                    var column = this;
+                    var select = $('<select><option value=""> ... </option></select>')
+                        .appendTo($(column.footer()).empty())
+                        .on('change', function () {
+                            column.search(this.value).draw();
+                        });
+                    select.append('<option value="1">Insurance</option>');
+                    select.append('<option value="2">ASO</option>');
+                });
+
+                this.api().columns([4]).every(function () {
+                    var column = this;
+                    var select = $('<select><option value=""> ... </option></select>')
+                        .appendTo($(column.footer()).empty())
+                        .on('change', function () {
+                            column.search(this.value).draw();
+                        });
+                    select.append('<option value="1">Aktif</option>');
+                    select.append('<option value="0">InActive</option>');
+                });
             },
             dom: '<"top"B>tr<"bottom"ip>',
             "ajax": $.fn.dataTable.pipeline( {
@@ -60,8 +84,8 @@
                 { data: "clientID", className: "dt-right" },
                 { data: "clientCode", className: "dt-right" },
                 { data: "clientName", className: "dt-right" },
-
                 { data: "clientTypeName" },
+                { data: "isActive" },
                 { data: "userCreate" },
                 { data: "dateCreate" },
                 { data: "userUpdate" },
