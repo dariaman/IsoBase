@@ -37,9 +37,9 @@ namespace IsoBase.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ListClientAll([DataTablesRequest] DataTablesRequest dataRequest)
+        public IActionResult ListClientAll([DataTablesRequest] DataTablesRequest dataRequest)
         {
-            var pgData = new PageData(dataRequest)
+            var pgData = new PageData(dataRequest, _context)
             {
                 select = @"SELECT cm.ClientID,cm.ClientCode,cm.Name ClientName,cm.ClientTypeID,ct.Name ClientTypeName,
                             cm.IsActive,cm.DateCreate,cm.UserCreate,ct.DateUpdate,ct.UserUpdate ",
@@ -55,47 +55,41 @@ namespace IsoBase.Controllers
                 else if (req.Data == "clientID") pgData.AddWhereRegex(pgData.paternAngka, req.SearchValue, "cm.ClientID");
                 else if (req.Data == "clientCode") pgData.AddWhereRegex(pgData.paternAngkaHuruf, req.SearchValue, "cm.ClientCode");
                 else if (req.Data == "clientTypeID") pgData.AddWhereRegex(pgData.paternAngka, req.SearchValue, "cm.ClientTypeID");
-                else if (req.Data == "name") pgData.AddWhereRegex(pgData.paternAngkaHuruf, req.SearchValue, "cm.Name");
+                else if (req.Data == "clientName") pgData.AddWhereRegex(pgData.paternAngkaHuruf, req.SearchValue, "cm.Name");
             }
-            var queryString = pgData.GenerateQueryData();
-            //List<ClientListVM> ClientLst = new List<ClientListVM>();
+            pgData.CountData(); // hitung jlh total data dan total dataFilter
 
-            //using (var dr =  _context.Database.ExecuteSqlCommand(queryString,ClientLst))
-            //{
+            DataTable _dt = new DataTable();
+            try
+            {
+                _dt = pgData.ListData();
+            }
+            catch (Exception ex) { throw new Exception(ex.Message); }
 
-            //}
-
-            //var ClientLst = _context.Database.SqlQuery<string>.FromSql(query); //.Set<ClientListVM>().FromSql(query);
-            //var lst = _context.Database.ExecuteSqlCommand(query).ToList();
-
-
-            //var ClientLst = _context.Database.ExecuteSqlCommand(queryString);
-            //var myCustomList = _context.Database.SqlQuery<CustomType>("SELECT … FROM …");
-            //var ClientLst = _context.Database.SqlQuery<ClientListVM>(queryString).ToList<ClientListVM>();
-
-            //var myList = await _context.Database.SqlQuery<CustomType>("SELECT … FROM …")
-            //                       .ToListAsync();
-            var ClientLst = _context.Set<ClientListVM>().FromSql(queryString).AsNoTracking().ToList();
-
-            //IEnumerable<ClientMasterModel> products = _context.ClientMasterModel.Skip(dataRequest.Start).Take(dataRequest.Length);
-            //int recordsTotal = 2000; // _context.Tabel1Model.Count();
-            ////int recordsTotal = products.Count();
-            //int recordsFilterd = 1000; // recordsTotal;
-            var a = 1;
-
-            //var psd = products
-            //    .Select(e => new
-            //    {
-            //        e.ClientID,
-            //        e.ClientCode,
-            //        e.Name,
-            //        e.ClientTypeID,
-            //        e.UserCreate,
-            //        e.DateCreate,
-            //        e.UserUpdate,
-            //        e.DateUpdate
-            //    });
-            return Json(ClientLst.ToDataTablesResponse(dataRequest, pgData.recordsTotal, pgData.recordsFilterd));
+            List<ClientListVM> ls = new List<ClientListVM>();
+            try
+            {
+                foreach (DataRow row in _dt.Rows)
+                {
+                    ls.Add(new ClientListVM
+                    {
+                        ClientID = row["ClientID"].ToString(),
+                        ClientCode = row["ClientCode"].ToString(),
+                        ClientName = row["ClientName"].ToString(),
+                        ClientTypeName = row["ClientTypeName"].ToString(),
+                        IsActive = row["IsActive"].ToString(),
+                        UserCreate = row["UserCreate"].ToString(),
+                        DateCreate = row["DateCreate"].ToString(),
+                        UserUpdate = row["UserUpdate"].ToString(),
+                        DateUpdate = row["DateUpdate"].ToString(),
+                    });
+                };
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+            return Json(ls.ToDataTablesResponse(dataRequest, pgData.recordsTotal, pgData.recordsFilterd));
         }
 
         // GET: ClientMaster/Details/5

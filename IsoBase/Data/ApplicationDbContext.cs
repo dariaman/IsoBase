@@ -15,6 +15,8 @@ namespace IsoBase.Data
         {
         }
 
+        public DbQuery<ClientListVM> ClientListVM { get; set; }
+
         public DbSet<ClientMasterModel> ClientMasterModel { get; set; }
         public DbSet<ClientTypeModel> ClientTypeModel { get; set; }
 

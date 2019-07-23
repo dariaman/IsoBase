@@ -4,7 +4,6 @@ namespace IsoBase.ViewModels
 {
     public class ClientListVM
     {
-        [Key]
         public string ClientID { get; set; }
         public string ClientCode { get; set; }
         public string ClientName { get; set; }
