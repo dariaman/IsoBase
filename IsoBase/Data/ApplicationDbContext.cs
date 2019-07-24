@@ -33,5 +33,6 @@ namespace IsoBase.Data
         public DbSet<BenefitCodesModel> BenefitCodesModel { get; set; }
         public DbSet<ClientMasterModel> ClientMasterModel { get; set; }
         public DbSet<ClientTypeModel> ClientTypeModel { get; set; }
+        public DbSet<IsoBase.Models.KalenderOperationalModel> KalenderOperationalModel { get; set; }
     }
 }

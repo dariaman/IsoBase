@@ -1,0 +1,113 @@
+﻿@model IEnumerable<IsoBase.Models.KalenderOperationalModel>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Tgl)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DayNumMonth)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DayNumYear)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DayNameEn)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DayNameInd)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.MonthYear)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.MonthNameEn)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.MonthNameInd)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.YearNumber)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.IsHoliday)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.UserCreate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DateCreate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.UserUpdate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DateUpdate)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Tgl)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DayNumMonth)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DayNumYear)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DayNameEn)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DayNameInd)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.MonthYear)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.MonthNameEn)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.MonthNameInd)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.YearNumber)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.IsHoliday)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.UserCreate)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DateCreate)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.UserUpdate)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DateUpdate)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.ID">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.ID">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.ID">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
