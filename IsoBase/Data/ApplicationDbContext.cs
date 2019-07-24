@@ -15,11 +15,6 @@ namespace IsoBase.Data
         {
         }
 
-        public DbQuery<ClientListVM> ClientListVM { get; set; }
-
-        public DbSet<ClientMasterModel> ClientMasterModel { get; set; }
-        public DbSet<ClientTypeModel> ClientTypeModel { get; set; }
-
         protected override void OnModelCreating(ModelBuilder builder)
         {
             builder.Entity<ClientMasterModel>(b => {
@@ -34,5 +29,9 @@ namespace IsoBase.Data
             });
             base.OnModelCreating(builder);
         }
+
+        public DbSet<BenefitCodesModel> BenefitCodesModel { get; set; }
+        public DbSet<ClientMasterModel> ClientMasterModel { get; set; }
+        public DbSet<ClientTypeModel> ClientTypeModel { get; set; }
     }
 }
