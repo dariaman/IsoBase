@@ -7,10 +7,7 @@
 @functions{ public string GetAntiXsrfRequestToken() { return Xsrf.GetAndStoreTokens(Context).RequestToken; }}
 
 <style>
-    tr > th > input[type=text]:first-child {
-        width: 100%;
-    }
-
+    tr > th > input[type=text]:first-child { width: 100%; }
 </style>
 
 <table id="myTable" class="display cell-border">
@@ -78,7 +75,7 @@
             } ),
 // ====================================================KONFIG KOLOM DATA==============================================================
             columns: [
-                { data: "code", className: "dt-right" ,"width": "5%",},
+                { data: "code", className: "dt-right" ,"width": "50px",},
                 { data: "loa" },
                 { data: "description"},
                 { data: "isActive" },

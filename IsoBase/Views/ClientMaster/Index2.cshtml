@@ -6,6 +6,7 @@
 @inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Xsrf
 @functions{ public string GetAntiXsrfRequestToken() { return Xsrf.GetAndStoreTokens(Context).RequestToken; }}
 
+<style> tr > th > input[type=text]:first-child { width: 100%; } </style>
 
 <table id="myTable" class="display cell-border">
     <thead class="ui-widget-header">
@@ -74,14 +75,14 @@
             dom: '<"top"B>tr<"bottom"ip>',
             "ajax": $.fn.dataTable.pipeline( {
                 "url": "@Url.Action("ListClientAll")",
-                data: { 
+                data: {
                      __RequestVerificationToken: '@GetAntiXsrfRequestToken()',
                 },
                 pages: 5 // number of pages to cache
             } ),
-// ====================================================KONFIG KOLOM DATA==============================================================           
+// ====================================================KONFIG KOLOM DATA==============================================================
             columns: [
-                { data: "clientID", className: "dt-right" },
+                { data: "clientID", className: "dt-right" ,"width": "50px"},
                 { data: "clientCode", className: "dt-right" },
                 { data: "clientName", className: "dt-right" },
                 { data: "clientTypeName" },
