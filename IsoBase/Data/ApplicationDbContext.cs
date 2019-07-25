@@ -36,5 +36,6 @@ namespace IsoBase.Data
         public DbSet<IsoBase.Models.KalenderOperationalModel> KalenderOperationalModel { get; set; }
         public DbSet<IsoBase.Models.LimitCodesModel> LimitCodesModel { get; set; }
         public DbSet<IsoBase.Models.CoverageCodesModel> CoverageCodesModel { get; set; }
+        public DbSet<IsoBase.Models.FrequencyCodesModel> FrequencyCodesModel { get; set; }
     }
 }
