@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 using IsoBase.Data;
 using IsoBase.Models;
 using DataTables.AspNetCore.Mvc.Binder;
@@ -9,16 +12,16 @@ using System.Data;
 
 namespace IsoBase.Controllers
 {
-    public class BenefitCodesController : Controller
+    public class CoverageCodesController : Controller
     {
         private readonly ApplicationDbContext _context;
 
-        public BenefitCodesController(ApplicationDbContext context)
+        public CoverageCodesController(ApplicationDbContext context)
         {
             _context = context;
         }
 
-        // GET: BenefitCodes
+        // GET: CoverageCodes
         public IActionResult Index()
         {
             return View();
@@ -26,12 +29,12 @@ namespace IsoBase.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult ListBenefitAll([DataTablesRequest] DataTablesRequest dataRequest)
+        public IActionResult ListCoverageCodesAll([DataTablesRequest] DataTablesRequest dataRequest)
         {
             var pgData = new PageData(dataRequest, _context)
             {
-                select = @"SELECT ID,Code,Description,IsActive,UserCreate,DateCreate,UserUpdate,DateUpdate ",
-                Tabel = @" FROM BenefitCodes WITH(NOLOCK) WHERE 1=1 ",
+                select = @"SELECT ID,ShortName,Description,IsActive,UserCreate,DateCreate,UserUpdate,DateUpdate ",
+                Tabel = @" FROM CoverageCodes WITH(NOLOCK) WHERE 1=1 ",
             };
 
             //defenisikan Where condition
@@ -39,9 +42,9 @@ namespace IsoBase.Controllers
             {
                 if (string.IsNullOrEmpty(req.SearchValue)) continue;
                 else if (req.Data == "id") pgData.AddWhereRegex(pgData.paternAngkaLike, req.SearchValue, "ID");
-                else if (req.Data == "code") pgData.AddWhereRegex(pgData.paternAngkaHurufLike, req.SearchValue, "Code");
-                else if (req.Data == "isActive") pgData.AddWhereRegex(pgData.paternAngka, req.SearchValue, "IsActive");
+                else if (req.Data == "shortName") pgData.AddWhereRegex(pgData.paternAngkaHurufLike, req.SearchValue, "ShortName");
                 else if (req.Data == "description") pgData.AddWhereRegex(pgData.paternAngkaHurufLike, req.SearchValue, "Description");
+                else if (req.Data == "isActive") pgData.AddWhereRegex(pgData.paternAngka, req.SearchValue, "IsActive");
             }
             pgData.CountData(); // hitung jlh total data dan total dataFilter
 
@@ -52,15 +55,15 @@ namespace IsoBase.Controllers
             }
             catch (Exception ex) { throw new Exception(ex.Message); }
 
-            List<BenefitCodesModel> ls = new List<BenefitCodesModel>();
+            List<CoverageCodesModel> ls = new List<CoverageCodesModel>();
             try
             {
                 foreach (DataRow row in _dt.Rows)
                 {
-                    ls.Add(new BenefitCodesModel
+                    ls.Add(new CoverageCodesModel
                     {
                         ID = (int)row["ID"],
-                        Code = row["Code"].ToString(),
+                        ShortName = row["ShortName"].ToString(),
                         Description = row["Description"].ToString(),
 
                         IsActive = (Boolean)row["IsActive"],
@@ -78,7 +81,7 @@ namespace IsoBase.Controllers
             return Json(ls.ToDataTablesResponse(dataRequest, pgData.recordsTotal, pgData.recordsFilterd));
         }
 
-        // GET: BenefitCodes/Details/5
+        // GET: CoverageCodes/Details/5
         //public async Task<IActionResult> Details(int? id)
         //{
         //    if (id == null)
@@ -86,39 +89,39 @@ namespace IsoBase.Controllers
         //        return NotFound();
         //    }
 
-        //    var benefitCodesModel = await _context.BenefitCodesModel
-        //        .FirstOrDefaultAsync(m => m.Code == id);
-        //    if (benefitCodesModel == null)
+        //    var coverageCodesModel = await _context.CoverageCodesModel
+        //        .FirstOrDefaultAsync(m => m.ID == id);
+        //    if (coverageCodesModel == null)
         //    {
         //        return NotFound();
         //    }
 
-        //    return View(benefitCodesModel);
+        //    return View(coverageCodesModel);
         //}
 
-        // GET: BenefitCodes/Create
+        //// GET: CoverageCodes/Create
         //public IActionResult Create()
         //{
         //    return View();
         //}
 
-        // POST: BenefitCodes/Create
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
+        //// POST: CoverageCodes/Create
+        //// To protect from overposting attacks, please enable the specific properties you want to bind to, for 
+        //// more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         //[HttpPost]
         //[ValidateAntiForgeryToken]
-        //public async Task<IActionResult> Create([Bind("Code,LOA_Desc,Description,IsActive,UserCreate,DateCreate,UserUpdate,DateUpdate")] BenefitCodesModel benefitCodesModel)
+        //public async Task<IActionResult> Create([Bind("ID,ShortName,Description,IsActive,UserCreate,DateCreate,UserUpdate,DateUpdate")] CoverageCodesModel coverageCodesModel)
         //{
         //    if (ModelState.IsValid)
         //    {
-        //        _context.Add(benefitCodesModel);
+        //        _context.Add(coverageCodesModel);
         //        await _context.SaveChangesAsync();
         //        return RedirectToAction(nameof(Index));
         //    }
-        //    return View(benefitCodesModel);
+        //    return View(coverageCodesModel);
         //}
 
-        //// GET: BenefitCodes/Edit/5
+        //// GET: CoverageCodes/Edit/5
         //public async Task<IActionResult> Edit(int? id)
         //{
         //    if (id == null)
@@ -126,22 +129,22 @@ namespace IsoBase.Controllers
         //        return NotFound();
         //    }
 
-        //    var benefitCodesModel = await _context.BenefitCodesModel.FindAsync(id);
-        //    if (benefitCodesModel == null)
+        //    var coverageCodesModel = await _context.CoverageCodesModel.FindAsync(id);
+        //    if (coverageCodesModel == null)
         //    {
         //        return NotFound();
         //    }
-        //    return View(benefitCodesModel);
+        //    return View(coverageCodesModel);
         //}
 
-        // POST: BenefitCodes/Edit/5
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
+        //// POST: CoverageCodes/Edit/5
+        //// To protect from overposting attacks, please enable the specific properties you want to bind to, for 
+        //// more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         //[HttpPost]
         //[ValidateAntiForgeryToken]
-        //public async Task<IActionResult> Edit(int id, [Bind("Code,LOA_Desc,Description,IsActive,UserCreate,DateCreate,UserUpdate,DateUpdate")] BenefitCodesModel benefitCodesModel)
+        //public async Task<IActionResult> Edit(int id, [Bind("ID,ShortName,Description,IsActive,UserCreate,DateCreate,UserUpdate,DateUpdate")] CoverageCodesModel coverageCodesModel)
         //{
-        //    if (id != benefitCodesModel.Code)
+        //    if (id != coverageCodesModel.ID)
         //    {
         //        return NotFound();
         //    }
@@ -150,12 +153,12 @@ namespace IsoBase.Controllers
         //    {
         //        try
         //        {
-        //            _context.Update(benefitCodesModel);
+        //            _context.Update(coverageCodesModel);
         //            await _context.SaveChangesAsync();
         //        }
         //        catch (DbUpdateConcurrencyException)
         //        {
-        //            if (!BenefitCodesModelExists(benefitCodesModel.Code))
+        //            if (!CoverageCodesModelExists(coverageCodesModel.ID))
         //            {
         //                return NotFound();
         //            }
@@ -166,10 +169,10 @@ namespace IsoBase.Controllers
         //        }
         //        return RedirectToAction(nameof(Index));
         //    }
-        //    return View(benefitCodesModel);
+        //    return View(coverageCodesModel);
         //}
 
-        //// GET: BenefitCodes/Delete/5
+        //// GET: CoverageCodes/Delete/5
         //public async Task<IActionResult> Delete(int? id)
         //{
         //    if (id == null)
@@ -177,30 +180,30 @@ namespace IsoBase.Controllers
         //        return NotFound();
         //    }
 
-        //    var benefitCodesModel = await _context.BenefitCodesModel
-        //        .FirstOrDefaultAsync(m => m.Code == id);
-        //    if (benefitCodesModel == null)
+        //    var coverageCodesModel = await _context.CoverageCodesModel
+        //        .FirstOrDefaultAsync(m => m.ID == id);
+        //    if (coverageCodesModel == null)
         //    {
         //        return NotFound();
         //    }
 
-        //    return View(benefitCodesModel);
+        //    return View(coverageCodesModel);
         //}
 
-        //// POST: BenefitCodes/Delete/5
+        //// POST: CoverageCodes/Delete/5
         //[HttpPost, ActionName("Delete")]
         //[ValidateAntiForgeryToken]
         //public async Task<IActionResult> DeleteConfirmed(int id)
         //{
-        //    var benefitCodesModel = await _context.BenefitCodesModel.FindAsync(id);
-        //    _context.BenefitCodesModel.Remove(benefitCodesModel);
+        //    var coverageCodesModel = await _context.CoverageCodesModel.FindAsync(id);
+        //    _context.CoverageCodesModel.Remove(coverageCodesModel);
         //    await _context.SaveChangesAsync();
         //    return RedirectToAction(nameof(Index));
         //}
 
-        private bool BenefitCodesModelExists(int id)
+        private bool CoverageCodesModelExists(int id)
         {
-            return _context.BenefitCodesModel.Any(e => e.ID == id);
+            return _context.CoverageCodesModel.Any(e => e.ID == id);
         }
     }
 }

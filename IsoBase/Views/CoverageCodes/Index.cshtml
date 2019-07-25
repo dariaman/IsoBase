@@ -1,0 +1,128 @@
+﻿
+@{
+    ViewData["Title"] = "Coverage Codes";
+}
+
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Xsrf
+@functions{ public string GetAntiXsrfRequestToken() { return Xsrf.GetAndStoreTokens(Context).RequestToken; }}
+
+<style>
+    tr > th > input[type=text]:first-child {
+        width: 100%;
+    }
+</style>
+
+<table id="myTable" class="display cell-border">
+    <thead class="ui-widget-header">
+        <tr>
+            <th>CoverageCodeID</th>
+            <th>ShortName</th>
+            <th>Description</th>
+
+            <th>IsActive</th>
+            <th>UserCreate</th>
+            <th>DateCreate</th>
+            <th>UserUpdate</th>
+            <th>DateUpdate</th>
+        </tr>
+    </thead>
+    <tfoot>
+        <tr>
+            <th class="search"></th>
+            <th class="search"></th>
+            <th class="search"></th>
+
+            <th class="search"></th>
+            <th class="search"></th>
+            <th class="search"></th>
+            <th class="search"></th>
+            <th class="search"></th>
+        </tr>
+    </tfoot>
+</table>
+
+<script src="~/js/site.js"></script>
+<script>
+    $(document).ready(function () {
+        $('#myTable').dataTable({
+            "jQueryUI": true,
+            serverSide: true,
+            processing: true,
+            columnDefs: [
+                { width: '50px', targets: 0 }
+            ],
+            //fixedColumns: true,
+            initComplete: function () {
+                var r = $('#myTable tfoot tr');
+                $('#myTable thead').append(r);
+                $('#search_0').css('text-align', 'center');
+                this.api().columns([3]).every(function () {
+                    var column = this;
+                    var select = $('<select><option value=""> ... </option></select>')
+                        .appendTo($(column.footer()).empty())
+                        .on('change', function () {
+                            column.search(this.value).draw();
+                        });
+                    select.append('<option value="1">Aktif</option>');
+                    select.append('<option value="0">InActive</option>');
+                });
+            },
+            dom: '<"top"B>tr<"bottom"ip>',
+            "ajax": $.fn.dataTable.pipeline( {
+                "url": "@Url.Action("ListCoverageCodesAll")",
+                data: {
+                     __RequestVerificationToken: '@GetAntiXsrfRequestToken()',
+                },
+                pages: 5 // number of pages to cache
+            } ),
+// ====================================================KONFIG KOLOM DATA==============================================================
+            columns: [
+                { data: "id", className: "dt-right" ,"width": "50px",},
+                { data: "shortName" },
+                { data: "description"},
+                { data: "isActive" },
+                { data: "userCreate" },
+                { data: "dateCreate" },
+                { data: "userUpdate" },
+                { data: "dateUpdate" },
+            ]
+// ====================================================END CONFIG KOLOM DATA==============================================================
+
+// ====================================================END DATATABLES Config==============================================================
+        });
+        // DataTable
+        var table = $('#myTable').DataTable();
+        /* Apply the search for individual columns*/
+        $('#myTable tfoot th').filter(":eq(0),:eq(1),:eq(2)").each(function () {
+            var title = $(this).text();
+            $(this).html('<input type="text"  placeholder=" ... " />');
+        });
+
+        table.columns().every(function () {
+            var that = this;
+            $('input', this.footer()).on('focusout', function () {
+                if (that.search() !== this.value) {
+                    that.search(this.value).draw();
+                }
+            });
+            $('input', this.footer()).on('keyup change', function (ev) {
+                if (ev.keyCode == 13) { //only on enter keypress (code 13)
+                    if (that.search() !== this.value) {
+                        that.search(this.value).draw();
+                    }
+                }
+            });
+        });
+
+        $('#myTable tbody').on('click', 'tr', function () {
+            if ($(this).hasClass('selected')) {
+                $(this).removeClass('selected');
+            }
+            else {
+                table.$('tr.selected').removeClass('selected');
+                $(this).addClass('selected');
+            }
+        });
+
+    });
+</script>

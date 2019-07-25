@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
 using IsoBase.Data;
 using IsoBase.Models;
 using DataTables.AspNetCore.Mvc.Binder;
@@ -22,7 +19,7 @@ namespace IsoBase.Controllers
         }
 
         // GET: LimitCodes
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
             return View();
         }
