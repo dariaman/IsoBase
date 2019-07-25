@@ -12,29 +12,29 @@ using System.Data;
 
 namespace IsoBase.Controllers
 {
-    public class BenefitCodesController : Controller
+    public class LimitCodesController : Controller
     {
         private readonly ApplicationDbContext _context;
 
-        public BenefitCodesController(ApplicationDbContext context)
+        public LimitCodesController(ApplicationDbContext context)
         {
             _context = context;
         }
 
-        // GET: BenefitCodes
-        public IActionResult Index()
+        // GET: LimitCodes
+        public async Task<IActionResult> Index()
         {
             return View();
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult ListBenefitAll([DataTablesRequest] DataTablesRequest dataRequest)
+        public IActionResult ListLimitCodeAll([DataTablesRequest] DataTablesRequest dataRequest)
         {
             var pgData = new PageData(dataRequest, _context)
             {
-                select = @"SELECT ID,Code,Description,IsActive,UserCreate,DateCreate,UserUpdate,DateUpdate ",
-                Tabel = @" FROM BenefitCodes WITH(NOLOCK) WHERE 1=1 ",
+                select = @"SELECT ID,Description,IsActive,UserCreate,DateCreate,UserUpdate,DateUpdate ",
+                Tabel = @" FROM LimitCodes WITH(NOLOCK) WHERE 1=1 ",
             };
 
             //defenisikan Where condition
@@ -42,7 +42,6 @@ namespace IsoBase.Controllers
             {
                 if (string.IsNullOrEmpty(req.SearchValue)) continue;
                 else if (req.Data == "id") pgData.AddWhereRegex(pgData.paternAngkaLike, req.SearchValue, "ID");
-                else if (req.Data == "code") pgData.AddWhereRegex(pgData.paternAngkaHurufLike, req.SearchValue, "Code");
                 else if (req.Data == "isActive") pgData.AddWhereRegex(pgData.paternAngka, req.SearchValue, "IsActive");
                 else if (req.Data == "description") pgData.AddWhereRegex(pgData.paternAngkaHurufLike, req.SearchValue, "Description");
             }
@@ -55,15 +54,14 @@ namespace IsoBase.Controllers
             }
             catch (Exception ex) { throw new Exception(ex.Message); }
 
-            List<BenefitCodesModel> ls = new List<BenefitCodesModel>();
+            List<LimitCodesModel> ls = new List<LimitCodesModel>();
             try
             {
                 foreach (DataRow row in _dt.Rows)
                 {
-                    ls.Add(new BenefitCodesModel
+                    ls.Add(new LimitCodesModel
                     {
                         ID = (int)row["ID"],
-                        Code = row["Code"].ToString(),
                         Description = row["Description"].ToString(),
 
                         IsActive = (Boolean)row["IsActive"],
@@ -81,7 +79,7 @@ namespace IsoBase.Controllers
             return Json(ls.ToDataTablesResponse(dataRequest, pgData.recordsTotal, pgData.recordsFilterd));
         }
 
-        // GET: BenefitCodes/Details/5
+        // GET: LimitCodes/Details/5
         //public async Task<IActionResult> Details(int? id)
         //{
         //    if (id == null)
@@ -89,39 +87,39 @@ namespace IsoBase.Controllers
         //        return NotFound();
         //    }
 
-        //    var benefitCodesModel = await _context.BenefitCodesModel
-        //        .FirstOrDefaultAsync(m => m.Code == id);
-        //    if (benefitCodesModel == null)
+        //    var limitCodesModel = await _context.LimitCodesModel
+        //        .FirstOrDefaultAsync(m => m.ID == id);
+        //    if (limitCodesModel == null)
         //    {
         //        return NotFound();
         //    }
 
-        //    return View(benefitCodesModel);
+        //    return View(limitCodesModel);
         //}
 
-        // GET: BenefitCodes/Create
+        //// GET: LimitCodes/Create
         //public IActionResult Create()
         //{
         //    return View();
         //}
 
-        // POST: BenefitCodes/Create
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
+        //// POST: LimitCodes/Create
+        //// To protect from overposting attacks, please enable the specific properties you want to bind to, for 
+        //// more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         //[HttpPost]
         //[ValidateAntiForgeryToken]
-        //public async Task<IActionResult> Create([Bind("Code,LOA_Desc,Description,IsActive,UserCreate,DateCreate,UserUpdate,DateUpdate")] BenefitCodesModel benefitCodesModel)
+        //public async Task<IActionResult> Create([Bind("ID,Description,IsActive,UserCreate,DateCreate,UserUpdate,DateUpdate")] LimitCodesModel limitCodesModel)
         //{
         //    if (ModelState.IsValid)
         //    {
-        //        _context.Add(benefitCodesModel);
+        //        _context.Add(limitCodesModel);
         //        await _context.SaveChangesAsync();
         //        return RedirectToAction(nameof(Index));
         //    }
-        //    return View(benefitCodesModel);
+        //    return View(limitCodesModel);
         //}
 
-        //// GET: BenefitCodes/Edit/5
+        //// GET: LimitCodes/Edit/5
         //public async Task<IActionResult> Edit(int? id)
         //{
         //    if (id == null)
@@ -129,22 +127,22 @@ namespace IsoBase.Controllers
         //        return NotFound();
         //    }
 
-        //    var benefitCodesModel = await _context.BenefitCodesModel.FindAsync(id);
-        //    if (benefitCodesModel == null)
+        //    var limitCodesModel = await _context.LimitCodesModel.FindAsync(id);
+        //    if (limitCodesModel == null)
         //    {
         //        return NotFound();
         //    }
-        //    return View(benefitCodesModel);
+        //    return View(limitCodesModel);
         //}
 
-        // POST: BenefitCodes/Edit/5
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
+        //// POST: LimitCodes/Edit/5
+        //// To protect from overposting attacks, please enable the specific properties you want to bind to, for 
+        //// more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         //[HttpPost]
         //[ValidateAntiForgeryToken]
-        //public async Task<IActionResult> Edit(int id, [Bind("Code,LOA_Desc,Description,IsActive,UserCreate,DateCreate,UserUpdate,DateUpdate")] BenefitCodesModel benefitCodesModel)
+        //public async Task<IActionResult> Edit(int id, [Bind("ID,Description,IsActive,UserCreate,DateCreate,UserUpdate,DateUpdate")] LimitCodesModel limitCodesModel)
         //{
-        //    if (id != benefitCodesModel.Code)
+        //    if (id != limitCodesModel.ID)
         //    {
         //        return NotFound();
         //    }
@@ -153,12 +151,12 @@ namespace IsoBase.Controllers
         //    {
         //        try
         //        {
-        //            _context.Update(benefitCodesModel);
+        //            _context.Update(limitCodesModel);
         //            await _context.SaveChangesAsync();
         //        }
         //        catch (DbUpdateConcurrencyException)
         //        {
-        //            if (!BenefitCodesModelExists(benefitCodesModel.Code))
+        //            if (!LimitCodesModelExists(limitCodesModel.ID))
         //            {
         //                return NotFound();
         //            }
@@ -169,10 +167,10 @@ namespace IsoBase.Controllers
         //        }
         //        return RedirectToAction(nameof(Index));
         //    }
-        //    return View(benefitCodesModel);
+        //    return View(limitCodesModel);
         //}
 
-        //// GET: BenefitCodes/Delete/5
+        //// GET: LimitCodes/Delete/5
         //public async Task<IActionResult> Delete(int? id)
         //{
         //    if (id == null)
@@ -180,30 +178,30 @@ namespace IsoBase.Controllers
         //        return NotFound();
         //    }
 
-        //    var benefitCodesModel = await _context.BenefitCodesModel
-        //        .FirstOrDefaultAsync(m => m.Code == id);
-        //    if (benefitCodesModel == null)
+        //    var limitCodesModel = await _context.LimitCodesModel
+        //        .FirstOrDefaultAsync(m => m.ID == id);
+        //    if (limitCodesModel == null)
         //    {
         //        return NotFound();
         //    }
 
-        //    return View(benefitCodesModel);
+        //    return View(limitCodesModel);
         //}
 
-        //// POST: BenefitCodes/Delete/5
+        //// POST: LimitCodes/Delete/5
         //[HttpPost, ActionName("Delete")]
         //[ValidateAntiForgeryToken]
         //public async Task<IActionResult> DeleteConfirmed(int id)
         //{
-        //    var benefitCodesModel = await _context.BenefitCodesModel.FindAsync(id);
-        //    _context.BenefitCodesModel.Remove(benefitCodesModel);
+        //    var limitCodesModel = await _context.LimitCodesModel.FindAsync(id);
+        //    _context.LimitCodesModel.Remove(limitCodesModel);
         //    await _context.SaveChangesAsync();
         //    return RedirectToAction(nameof(Index));
         //}
 
-        private bool BenefitCodesModelExists(int id)
+        private bool LimitCodesModelExists(int id)
         {
-            return _context.BenefitCodesModel.Any(e => e.ID == id);
+            return _context.LimitCodesModel.Any(e => e.ID == id);
         }
     }
 }

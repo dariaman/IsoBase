@@ -1,20 +1,21 @@
 ﻿
 @{
-    ViewData["Title"] = "Benefit Codes";
+    ViewData["Title"] = "Limit Codes";
 }
 
 @inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Xsrf
 @functions{ public string GetAntiXsrfRequestToken() { return Xsrf.GetAndStoreTokens(Context).RequestToken; }}
 
 <style>
-    tr > th > input[type=text]:first-child { width: 100%; }
+    tr > th > input[type=text]:first-child {
+        width: 100%;
+    }
 </style>
 
 <table id="myTable" class="display cell-border">
     <thead class="ui-widget-header">
         <tr>
-            <th>BenefitID</th>
-            <th>Code</th>
+            <th>LimitID</th>
             <th>Description</th>
 
             <th>IsActive</th>
@@ -26,7 +27,6 @@
     </thead>
     <tfoot>
         <tr>
-            <th class="search"></th>
             <th class="search"></th>
             <th class="search"></th>
 
@@ -54,7 +54,7 @@
                 var r = $('#myTable tfoot tr');
                 $('#myTable thead').append(r);
                 $('#search_0').css('text-align', 'center');
-                this.api().columns([3]).every(function () {
+                this.api().columns([2]).every(function () {
                     var column = this;
                     var select = $('<select><option value=""> ... </option></select>')
                         .appendTo($(column.footer()).empty())
@@ -67,7 +67,7 @@
             },
             dom: '<"top"B>tr<"bottom"ip>',
             "ajax": $.fn.dataTable.pipeline( {
-                "url": "@Url.Action("ListBenefitAll")",
+                "url": "@Url.Action("ListLimitCodeAll")",
                 data: {
                      __RequestVerificationToken: '@GetAntiXsrfRequestToken()',
                 },
@@ -76,7 +76,6 @@
 // ====================================================KONFIG KOLOM DATA==============================================================
             columns: [
                 { data: "id", className: "dt-right" ,"width": "50px",},
-                { data: "code" },
                 { data: "description"},
                 { data: "isActive" },
                 { data: "userCreate" },
@@ -91,7 +90,7 @@
         // DataTable
         var table = $('#myTable').DataTable();
         /* Apply the search for individual columns*/
-        $('#myTable tfoot th').filter(":eq(0),:eq(1),:eq(2)").each(function () {
+        $('#myTable tfoot th').filter(":eq(0),:eq(1)").each(function () {
             var title = $(this).text();
             $(this).html('<input type="text"  placeholder=" ... " />');
         });

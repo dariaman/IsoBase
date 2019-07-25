@@ -4,13 +4,12 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace IsoBase.Models
 {
-    [Table("BenefitCodes")]
-    public class BenefitCodesModel
+    [Table("LimitCodes")]
+    public class LimitCodesModel
     {
         [Key]
         public int ID { get; set; }
         [Required]
-        public string Code { get; set; }
         public string Description { get; set; }
 
         public Boolean IsActive { get; set; }
