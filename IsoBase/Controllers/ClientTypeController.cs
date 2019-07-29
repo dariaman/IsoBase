@@ -30,7 +30,7 @@ namespace IsoBase.Controllers
         [Route("clientAll")]
         public IActionResult Get([DataTablesRequest] DataTablesRequest dataRequest)
         {
-            IEnumerable<ClientMasterModel> products = _context.ClientMasterModel.Skip(dataRequest.Start).Take(dataRequest.Length);
+            IEnumerable<ClientModel> products = _context.ClientModel.Skip(dataRequest.Start).Take(dataRequest.Length);
             int recordsTotal = 2000; // _context.Tabel1Model.Count();
             //int recordsTotal = products.Count();
             int recordsFilterd = 1000; // recordsTotal;
@@ -45,7 +45,7 @@ namespace IsoBase.Controllers
             return Json(products
                 .Select(e => new
                 {
-                    e.ClientID,
+                    e.ID,
                     e.ClientCode,
                     e.Name
                 })

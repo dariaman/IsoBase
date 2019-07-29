@@ -63,16 +63,13 @@
                             </ul>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="ClientMaster" asp-action="Index">ClientMaster</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="ClientMaster" asp-action="Index2">ClientMaster2</a>
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Client" asp-action="Index">ClientMaster</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="ClientType" asp-action="Index">ClientType</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="ClientType" asp-action="Index">Enrollment</a>
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Enrollment" asp-action="Index">Enrollment</a>
                         </li>
                     </ul>
                 </div>
@@ -81,14 +78,15 @@
     </header>
     <div style="padding-left:20px;min-width:80%;">
         <partial name="_CookieConsentPartial" />
+        <br />
         <center><h3>@ViewData["Title"]</h3></center>
-
+        <br />
         @RenderBody()
     </div>
 
     <footer class="border-top footer text-muted">
         <div class="container">
-            &copy; 2019 - IsoBase - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            &copy; 2019 - <a href="http://isomedik.com">Isomedik.com</a>
         </div>
     </footer>
 

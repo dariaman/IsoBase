@@ -4,11 +4,11 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace IsoBase.Models
 {
-    [Table("ClientMaster")]
-    public class ClientMasterModel
+    [Table("Client")]
+    public class ClientModel
     {
         [Key]
-        public int ClientID { get; set; }
+        public int ID { get; set; }
         [Required]
         public string ClientCode { get; set; }
         [Required]

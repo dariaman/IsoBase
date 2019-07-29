@@ -1,0 +1,110 @@
+﻿
+@{
+    ViewData["Title"] = "Enrollment";
+}
+
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Xsrf
+@functions{ public string GetAntiXsrfRequestToken() { return Xsrf.GetAndStoreTokens(Context).RequestToken; }}
+
+<style>
+    tr > th > input[type=text]:first-child {
+        width: 100%;
+    }
+</style>
+
+<table id="myTable" class="display cell-border">
+    <thead class="ui-widget-header">
+        <tr>
+            <th style="width:10px;">No</th>
+            <th>ClientCode</th>
+            <th>ClientName</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tfoot>
+        <tr>
+            <th class="search"></th>
+            <th class="search"></th>
+            <th class="search"></th>
+            <th class="search"></th>
+        </tr>
+    </tfoot>
+</table>
+
+<script src="~/js/site.js"></script>
+<script>
+    $(document).ready(function () {
+        $('#myTable').dataTable({
+            "jQueryUI": true,
+            serverSide: true,
+            processing: true,
+            columnDefs: [
+                { width: '50px', targets: 0 }
+            ],
+            //fixedColumns: true,
+            initComplete: function () {
+                var r = $('#myTable tfoot tr');
+                $('#myTable thead').append(r);
+                $('#search_0').css('text-align', 'center');
+            },
+            dom: '<"top"B>tr<"bottom"ip>',
+            "ajax": $.fn.dataTable.pipeline( {
+                "url": "@Url.Action("ListClientActive")",
+                data: {
+                     __RequestVerificationToken: '@GetAntiXsrfRequestToken()',
+                },
+                pages: 5 // number of pages to cache
+            } ),
+// ====================================================KONFIG KOLOM DATA==============================================================
+            columns: [
+                { data: "No",
+                    render: function (data, type, row, meta) { return meta.row + meta.settings._iDisplayStart + 1; }
+                },
+                { data: "clientCode" },
+                { data: "clientName" },
+                { data: null},
+            ],
+            "order": [[ 1, "asc" ]],
+            "columnDefs": [
+                { "orderable": false, "targets": 0 }
+            ]
+// ====================================================END CONFIG KOLOM DATA==============================================================
+
+// ====================================================END DATATABLES Config==============================================================
+        });
+        // DataTable
+        var table = $('#myTable').DataTable();
+        /* Apply the search for individual columns*/
+        $('#myTable tfoot th').filter(":eq(1),:eq(2)").each(function () {
+            var title = $(this).text();
+            $(this).html('<input type="text"  placeholder=" ... " />');
+        });
+
+        table.columns().every(function () {
+            var that = this;
+            $('input', this.footer()).on('focusout', function () {
+                if (that.search() !== this.value) {
+                    that.search(this.value).draw();
+                }
+            });
+            $('input', this.footer()).on('keyup change', function (ev) {
+                if (ev.keyCode == 13) { //only on enter keypress (code 13)
+                    if (that.search() !== this.value) {
+                        that.search(this.value).draw();
+                    }
+                }
+            });
+        });
+
+        $('#myTable tbody').on('click', 'tr', function () {
+            if ($(this).hasClass('selected')) {
+                $(this).removeClass('selected');
+            }
+            else {
+                table.$('tr.selected').removeClass('selected');
+                $(this).addClass('selected');
+            }
+        });
+
+    });
+</script>

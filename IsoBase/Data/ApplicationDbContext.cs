@@ -17,8 +17,8 @@ namespace IsoBase.Data
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
-            builder.Entity<ClientMasterModel>(b => {
-                b.HasKey(u => u.ClientID);
+            builder.Entity<ClientModel>(b => {
+                b.HasKey(u => u.ID);
                 b.Property(u => u.IsActive).HasDefaultValueSql("1");
                 b.Property(u => u.DateCreate).HasDefaultValueSql("getdate()");
             });
@@ -31,11 +31,15 @@ namespace IsoBase.Data
         }
 
         public DbSet<BenefitCodesModel> BenefitCodesModel { get; set; }
-        public DbSet<ClientMasterModel> ClientMasterModel { get; set; }
+        public DbSet<ClientModel> ClientModel { get; set; }
         public DbSet<ClientTypeModel> ClientTypeModel { get; set; }
-        public DbSet<IsoBase.Models.KalenderOperationalModel> KalenderOperationalModel { get; set; }
-        public DbSet<IsoBase.Models.LimitCodesModel> LimitCodesModel { get; set; }
-        public DbSet<IsoBase.Models.CoverageCodesModel> CoverageCodesModel { get; set; }
-        public DbSet<IsoBase.Models.FrequencyCodesModel> FrequencyCodesModel { get; set; }
+        public DbSet<KalenderOperationalModel> KalenderOperationalModel { get; set; }
+        public DbSet<LimitCodesModel> LimitCodesModel { get; set; }
+        public DbSet<CoverageCodesModel> CoverageCodesModel { get; set; }
+        public DbSet<FrequencyCodesModel> FrequencyCodesModel { get; set; }
+        public DbSet<PlanLimitModel> PlanLimitModel { get; set; }
+        public DbSet<CoverageLimitModel> CoverageLimitModel { get; set; }
+        public DbSet<BenefitModel> BenefitModel { get; set; }
+        public DbSet<BenefitLimitValueModel> BenefitLimitValueModel { get; set; }
     }
 }

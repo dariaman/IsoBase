@@ -4,27 +4,23 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace IsoBase.Models
 {
-    [Table("PlanMaster")]
-    public class PlanMasterModel
+    [Table("PlanLimit")]
+    public class PlanLimitModel
     {
         [Key]
-        public int PlanID { get; set; }
+        public int ID { get; set; }
+
         [Required]
-        public string ClientID { get; set; }
+        public int ClientID { get; set; }
         public string PolicyNo { get; set; }
-
         public string PlanCode { get; set; }
-        public string ShortName { get; set; }
 
-        /*
+        public string ShortName { get; set; }
         public string LongName { get; set; }
-        public DateTime? EffectiveDate { get; set; }
-        public DateTime? TerminationDate { get; set; }
-        public int FrequencyCode { get; set; }
-        public int FrequencyLimit { get; set; }
-        public int MaxLimitCode { get; set; }
-        public decimal MaxValueLimit { get; set; }
-        */
+        
+        public int? FrequencyCodeID { get; set; }
+        public int? LimitCodeID { get; set; }
+        public decimal? MaxLimitValue { get; set; }
 
         public Boolean IsActive { get; set; }
         public string UserCreate { get; set; }
