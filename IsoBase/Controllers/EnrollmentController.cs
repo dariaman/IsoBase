@@ -7,21 +7,25 @@ using DataTables.AspNetCore.Mvc.Binder;
 using IsoBase.Data;
 using IsoBase.ViewModels;
 using Microsoft.AspNetCore.Mvc;
+using Vereyon.Web;
 
 namespace IsoBase.Controllers
 {
     public class EnrollmentController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private IFlashMessage flashMessage;
 
-        public EnrollmentController(ApplicationDbContext context)
+        public EnrollmentController(ApplicationDbContext context, IFlashMessage flash)
         {
             _context = context;
+            flashMessage = flash;
         }
 
 
         public IActionResult Index()
         {
+            flashMessage.Info("Your informational message");
             return View();
         }
 

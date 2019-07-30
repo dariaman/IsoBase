@@ -41,5 +41,6 @@ namespace IsoBase.Data
         public DbSet<CoverageLimitModel> CoverageLimitModel { get; set; }
         public DbSet<BenefitModel> BenefitModel { get; set; }
         public DbSet<BenefitLimitValueModel> BenefitLimitValueModel { get; set; }
+        public DbSet<MemberModel> MemberModel { get; set; }
     }
 }

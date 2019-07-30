@@ -13,6 +13,7 @@ using Microsoft.EntityFrameworkCore;
 using IsoBase.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
 
 namespace IsoBase
 {
@@ -38,6 +39,10 @@ namespace IsoBase
             services.AddDbContext<UserDbContext>(options =>options.UseSqlServer(Configuration.GetConnectionString("IsoUser")));
             services.AddDbContext<StagingDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("IsoStaging")));
             services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("IsoDB")));
+
+            services.AddSingleton<ITempDataProvider, CookieTempDataProvider>();
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            services.AddScoped<Vereyon.Web.IFlashMessage, Vereyon.Web.FlashMessage>();
 
             services.AddDefaultIdentity<IdentityUser>()
                 .AddDefaultUI(UIFramework.Bootstrap4)
