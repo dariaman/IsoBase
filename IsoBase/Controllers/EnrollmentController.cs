@@ -22,16 +22,25 @@ namespace IsoBase.Controllers
             flashMessage = flash;
         }
 
-
         public IActionResult Index()
         {
-            flashMessage.Info("Your informational message");
+            
+            return View();
+        }
+
+        public IActionResult Plan(string ClientID)
+        {
+            return View();
+        }
+
+        public IActionResult Member()
+        {
             return View();
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult ListClientActive([DataTablesRequest] DataTablesRequest dataRequest)
+        public IActionResult ClientActiveAll([DataTablesRequest] DataTablesRequest dataRequest)
         {
             var pgData = new PageData(dataRequest, _context)
             {
@@ -43,9 +52,9 @@ namespace IsoBase.Controllers
             foreach (var req in dataRequest.Columns)
             {
                 if (string.IsNullOrEmpty(req.SearchValue)) continue;
-                else if (req.Data == "id") pgData.AddWhereRegex(pgData.paternAngkaLike, req.SearchValue, "ID");
+                //else if (req.Data == "clientID") pgData.AddWhereRegex(pgData.paternAngkaLike, req.SearchValue, "ID");
                 else if (req.Data == "clientCode") pgData.AddWhereRegex(pgData.paternAngkaHurufLike, req.SearchValue, "ClientCode");
-                else if (req.Data == "name") pgData.AddWhereRegex(pgData.paternAngka, req.SearchValue, "Name");
+                else if (req.Data == "clientName") pgData.AddWhereRegex(pgData.paternAngka, req.SearchValue, "Name");
             }
             pgData.CountData(); // hitung jlh total data dan total dataFilter
 
@@ -54,7 +63,7 @@ namespace IsoBase.Controllers
             {
                 _dt = pgData.ListData();
             }
-            catch (Exception ex) { throw new Exception(ex.Message); }
+            catch (Exception ex) { flashMessage.Info(ex.Message);  }
 
             List<EnrollmentVM> ls = new List<EnrollmentVM>();
             try
@@ -71,7 +80,61 @@ namespace IsoBase.Controllers
             }
             catch (Exception ex)
             {
-                throw new Exception(ex.Message);
+                flashMessage.Info(ex.Message);
+                //throw new Exception(ex.Message);
+            }
+            return Json(ls.ToDataTablesResponse(dataRequest, pgData.recordsTotal, pgData.recordsFilterd));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult PlanByClientListAll([DataTablesRequest] DataTablesRequest dataRequest,string clientID)
+        {
+            var pgData = new PageData(dataRequest, _context)
+            {
+                select = @"SELECT ID,ClientID,PolicyNo,PlanCode,IsActive,UserCreate,DateCreate ",
+                Tabel = @" FROM dbo.PlanLimit WHERE IsActive=1 ",
+            };
+
+            //defenisikan Where condition
+            foreach (var req in dataRequest.Columns)
+            {
+                if (string.IsNullOrEmpty(req.SearchValue)) continue;
+                else if (req.Data == "id") pgData.AddWhereRegex(pgData.paternAngkaLike, req.SearchValue, "ID");
+                else if (req.Data == "clientID") pgData.AddWhereRegex(pgData.paternAngkaHurufLike, req.SearchValue, "ClientID");
+                else if (req.Data == "policyNo") pgData.AddWhereRegex(pgData.paternAngka, req.SearchValue, "PolicyNo");
+                else if (req.Data == "planCode") pgData.AddWhereRegex(pgData.paternAngka, req.SearchValue, "PlanCode");
+            }
+            pgData.CountData(); // hitung jlh total data dan total dataFilter
+
+            DataTable _dt = new DataTable();
+            try
+            {
+                _dt = pgData.ListData();
+            }
+            catch (Exception ex) { flashMessage.Info(ex.Message); }
+
+            List<PlanVM> ls = new List<PlanVM>();
+            try
+            {
+                foreach (DataRow row in _dt.Rows)
+                {
+                    ls.Add(new PlanVM
+                    {
+                        ID = row["ID"].ToString(),
+                        ClientID = row["ClientID"].ToString(),
+                        PolicyNo = row["PolicyNo"].ToString(),
+                        PlanCode = row["PlanCode"].ToString(),
+                        IsActive = row["IsActive"].ToString(),
+                        UserCreate = row["UserCreate"].ToString(),
+                        DateCreate = row["DateCreate"].ToString(),
+                    });
+                };
+            }
+            catch (Exception ex)
+            {
+                flashMessage.Info(ex.Message);
+                //throw new Exception(ex.Message);
             }
             return Json(ls.ToDataTablesResponse(dataRequest, pgData.recordsTotal, pgData.recordsFilterd));
         }

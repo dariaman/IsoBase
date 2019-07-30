@@ -1,29 +1,59 @@
 ﻿
 @{
-    ViewData["Title"] = "Enrollment";
+    ViewData["Title"] = "Plan Limit";
 }
 
 @inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Xsrf
 @functions{ public string GetAntiXsrfRequestToken() { return Xsrf.GetAndStoreTokens(Context).RequestToken; }}
 
-<style>
-    tr > th > input[type=text]:first-child {
-        width: 100%;
-    }
-</style>
-
-<table id="myTable" class="display cell-border">
-    <thead class="ui-widget-header">
+<table id="tablePlan" class="table table-striped table-bordered" cellspacing="0" width="100%">
+    <thead>
         <tr>
-            <th>No</th>
-            <th>ClientCode</th>
-            <th>ClientName</th>
-            <th>Action</th>
+            <th>Name</th>
+            <th>Position</th>
+            <th>Office</th>
+            <th>Extn.</th>
         </tr>
     </thead>
     <tfoot>
         <tr>
-            <th class="search"></th> 
+            <th class="search"></th>
+            <th class="search"></th>
+            <th class="search"></th>
+            <th class="search"></th>
+        </tr>
+    </tfoot>
+</table>
+<table id="tableCoverage" class="table table-striped table-bordered" cellspacing="0" width="100%">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Position</th>
+            <th>Office</th>
+            <th>Extn.</th>
+        </tr>
+    </thead>
+    <tfoot>
+        <tr>
+            <th class="search"></th>
+            <th class="search"></th>
+            <th class="search"></th>
+            <th class="search"></th>
+        </tr>
+    </tfoot>
+</table>
+<table id="tableBenefit" class="table table-striped table-bordered" cellspacing="0" width="100%">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Position</th>
+            <th>Office</th>
+            <th>Extn.</th>
+        </tr>
+    </thead>
+    <tfoot>
+        <tr>
+            <th class="search"></th>
             <th class="search"></th>
             <th class="search"></th>
             <th class="search"></th>
@@ -31,9 +61,14 @@
     </tfoot>
 </table>
 
+
 <script src="~/js/site.js"></script>
 <script>
     $(document).ready(function () {
+        $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+            $.fn.dataTable.tables({ visible: true, api: true }).columns.adjust();
+        });
+
         $('#myTable').dataTable({
             "jQueryUI": true,
             serverSide: true,
@@ -45,7 +80,7 @@
             },
             dom: '<"top"B>tr<"bottom"ip>',
             "ajax": $.fn.dataTable.pipeline( {
-                "url": "@Url.Action("ClientActiveAll")",
+                "url": "@Url.Action("ListClientActive")",
                 data: {
                      __RequestVerificationToken: '@GetAntiXsrfRequestToken()',
                 },
@@ -58,12 +93,6 @@
                 },
                 { data: "clientCode" },
                 { data: "clientName" },
-                { data: "clientID",className: "dt-center" ,"width": "10px",
-                    render: function (data, type, row, meta) {
-                        return '<a href="@Url.Action("Member")/ClientID=' + data + '"><i class="fas fa-id-card-alt fa-lg" title="Enroll Member"></i></a> &nbsp;&nbsp;' + 
-                            ' <a href="@Url.Action("Plan")/ClientID=' + data + '"><i class="fas fa-notes-medical fa-lg text-success" title="Enroll Plan"></i></a>';
-                    }
-                },
             ],
             "order": [[ 1, "asc" ]],
             "columnDefs": [
@@ -73,10 +102,11 @@
 
 // ====================================================END DATATABLES Config==============================================================
         });
+
         // DataTable
-        var table = $('#myTable').DataTable();
+        var table = $('#tablePlan').DataTable();
         /* Apply the search for individual columns*/
-        $('#myTable tfoot th').filter(":eq(1),:eq(2)").each(function () {
+        $('#tablePlan tfoot th').filter(":eq(1),:eq(2)").each(function () {
             var title = $(this).text();
             $(this).html('<input type="text"  placeholder=" ... " />');
         });
@@ -97,7 +127,7 @@
             });
         });
 
-        $('#myTable tbody').on('click', 'tr', function () {
+        $('#tablePlan tbody').on('click', 'tr', function () {
             if ($(this).hasClass('selected')) {
                 $(this).removeClass('selected');
             }
