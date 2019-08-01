@@ -60,8 +60,8 @@
                 { data: "clientName" },
                 { data: "clientID",className: "dt-center" ,"width": "10px",
                     render: function (data, type, row, meta) {
-                        return '<a href="@Url.Action("Member")/ClientID=' + data + '"><i class="fas fa-id-card-alt fa-lg" title="Enroll Member"></i></a> &nbsp;&nbsp;' + 
-                            ' <a href="@Url.Action("Plan")/ClientID=' + data + '"><i class="fas fa-notes-medical fa-lg text-success" title="Enroll Plan"></i></a>';
+                        return '<a href="@Url.Action("Member")?ClientID=' + data + '"><i class="fas fa-id-card-alt fa-lg" title="Enroll Member"></i></a> &nbsp;&nbsp;' + 
+                            ' <a href="@Url.Action("Plan")?ClientID=' + data + '"><i class="fas fa-notes-medical fa-lg text-success" title="Enroll Plan"></i></a>';
                     }
                 },
             ],
