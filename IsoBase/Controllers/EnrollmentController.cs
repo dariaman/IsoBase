@@ -14,6 +14,8 @@ using IsoBase.Models;
 using Microsoft.AspNetCore.Http;
 using System.IO;
 using Microsoft.Extensions.Configuration;
+using IsoBase.Extension;
+using OfficeOpenXml;
 
 namespace IsoBase.Controllers
 {
@@ -22,13 +24,12 @@ namespace IsoBase.Controllers
         private readonly ApplicationDbContext _context;
         private IFlashMessage flashMessage;
         private static string paternAngka { get; } = @"[^0-9]";
-        private IConfiguration Configuration { get; }
 
-        public EnrollmentController(ApplicationDbContext context, IFlashMessage flash, IConfiguration configuration)
+
+        public EnrollmentController(ApplicationDbContext context, IFlashMessage flash)
         {
             _context = context;
             flashMessage = flash;
-            Configuration = configuration;
         }
 
         public IActionResult Index()
@@ -66,14 +67,32 @@ namespace IsoBase.Controllers
                 flashMessage.Danger("File Not Selected");
                 return Redirect(_urlBack);
             }
-
             // ==============End Validation========================
-
-            var path = Path.Combine(Configuration.GetConnectionString("FilePlanExcel"), ClientfilePlan.Fileupload.FileName);
-            using (var stream = new FileStream(path, FileMode.Create))
+            var uplExt = new FileUploadExt();
+            FileStream Filestrm;
+            
+            // upload file ke server
+            // Param 1 untuk file Plan excel 
+            try { Filestrm = await uplExt.BackupFile(1, ClientfilePlan.Fileupload); }
+            catch (Exception ex)
             {
-                await ClientfilePlan.Fileupload.CopyToAsync(stream);
+                flashMessage.Danger(ex.Message);
+                return Redirect(_urlBack);
             }
+            var excelRead = new ExcelExt(Filestrm);
+            var enroll = excelRead.ReadExcelEnrollPlan();
+
+
+
+            // defenisikan file sebagai file Excel .XLSX
+            //try { package = new ExcelPackage(Filestrm); }
+            //catch (Exception ex)
+            //{
+            //    flashMessage.Danger("The file is not an valid Excel file. If the file is encrypted, please remove the password");
+            //    return Redirect(_urlBack);
+            //}
+
+            flashMessage.Confirmation("Upload Success");
             return RedirectToAction("index");
         }
 
