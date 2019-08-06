@@ -16,19 +16,24 @@ using System.IO;
 using Microsoft.Extensions.Configuration;
 using IsoBase.Extension;
 using OfficeOpenXml;
+using EFCore.BulkExtensions;
+using Microsoft.AspNetCore.Identity;
+using System.Security.Claims;
 
 namespace IsoBase.Controllers
 {
     public class EnrollmentController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly StagingDbContext _contextStg;
         private IFlashMessage flashMessage;
         private static string paternAngka { get; } = @"[^0-9]";
 
 
-        public EnrollmentController(ApplicationDbContext context, IFlashMessage flash)
+        public EnrollmentController(ApplicationDbContext context, StagingDbContext contextStg, IFlashMessage flash)
         {
             _context = context;
+            _contextStg = contextStg;
             flashMessage = flash;
         }
 
@@ -61,39 +66,42 @@ namespace IsoBase.Controllers
 
         public async Task<IActionResult> UploadFilePlan([Bind("ID,Fileupload")] UploadFilePlanVM ClientfilePlan)
         {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+
             string _urlBack = (Request.Headers["Referer"].ToString() == "" ? "Index" : Request.Headers["Referer"].ToString());
-            if (ClientfilePlan.Fileupload == null || ClientfilePlan.Fileupload.Length == 0)
+
+            try
             {
-                flashMessage.Danger("File Not Selected");
-                return Redirect(_urlBack);
+                if (ClientfilePlan.Fileupload == null || ClientfilePlan.Fileupload.Length == 0)
+                    throw new Exception("File Not Selected");
+
+                FileUploadExt uplExt = new FileUploadExt();
+                FileStream Filestrm;
+                ExcelExt excelRead;
+                //List<PlanUploadModel> enroll;
+
+                // upload file ke server
+                // Param 1 untuk file Plan excel 
+                try { Filestrm = await uplExt.BackupFile(1, ClientfilePlan.Fileupload); }
+                catch (Exception ex){ throw new Exception(ex.Message); }
+
+                //// Copy File To Server
+                try { excelRead = new ExcelExt(Filestrm, _contextStg); }
+                catch (Exception ex) { throw new Exception("Error Send File : " + ex.Message); }
+
+                //// Read Cell Value and insert to DB
+                try {  excelRead.ReadExcelEnrollPlan(); }
+                catch (Exception ex) { throw new Exception("Error Read Excel : " + ex.Message); }
+                
+                
+                flashMessage.Confirmation("Upload Success");
             }
-            // ==============End Validation========================
-            var uplExt = new FileUploadExt();
-            FileStream Filestrm;
-            
-            // upload file ke server
-            // Param 1 untuk file Plan excel 
-            try { Filestrm = await uplExt.BackupFile(1, ClientfilePlan.Fileupload); }
             catch (Exception ex)
             {
                 flashMessage.Danger(ex.Message);
-                return Redirect(_urlBack);
             }
-            var excelRead = new ExcelExt(Filestrm);
-            var enroll = excelRead.ReadExcelEnrollPlan();
-
-
-
-            // defenisikan file sebagai file Excel .XLSX
-            //try { package = new ExcelPackage(Filestrm); }
-            //catch (Exception ex)
-            //{
-            //    flashMessage.Danger("The file is not an valid Excel file. If the file is encrypted, please remove the password");
-            //    return Redirect(_urlBack);
-            //}
-
-            flashMessage.Confirmation("Upload Success");
-            return RedirectToAction("index");
+            return Redirect(_urlBack);
         }
 
 

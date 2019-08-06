@@ -1,9 +1,13 @@
-﻿using IsoBase.ViewModels;
+﻿using EPPlus.DataExtractor;
+using IsoBase.Models;
+using IsoBase.ViewModels;
+using System.Collections.Generic;
 using OfficeOpenXml;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using IsoBase.Data;
+using EFCore.BulkExtensions;
 using System.Threading.Tasks;
 
 namespace IsoBase.Extension
@@ -11,58 +15,115 @@ namespace IsoBase.Extension
     public class ExcelExt
     {
         FileStream _filestrm;
-        public ExcelExt(FileStream Filestrm)
+        private readonly StagingDbContext _contextStg;
+
+        public ExcelExt(FileStream Filestrm, StagingDbContext contextStg)
         {
             _filestrm = Filestrm;
+            _contextStg = contextStg;
         }
 
-        public EnrollPlanFileExcelDataVM ReadExcelEnrollPlan()
+        public void ReadExcelEnrollPlan()
         {
-            var evm = new EnrollPlanFileExcelDataVM();
+            //var evm = new List<PlanUploadModel>();
             ExcelPackage package;
             try { package = new ExcelPackage(this._filestrm); }
             catch { throw new Exception("The file is not an valid Excel file. If the file is encrypted, please remove the password"); }
 
             if (package.Workbook.Worksheets.Count() < 3) throw new Exception("File must consist of 3 sheet (Plan,Coverage,Benefit)");
 
-            // Sheet 1 Plan
-            ExcelWorksheet worksheet = package.Workbook.Worksheets[0];
-            int rowCount = worksheet.Dimension.Rows;
-            for (int row = 2; row <= rowCount; row++) // baca mulai dari row 2
+            var plans = new List<PlanUploadModel>();
+            var covs = new List<CoverageUploadModel>();
+            var benfs = new List<BenefitUploadModel>();
+            ExcelWorksheet ws0 = package.Workbook.Worksheets[0];
+            try
             {
-                var pl = new PlanFileData
-                {
-                    PayorCode = worksheet.Cells[row, 2].Value.ToString(),
-                    PlanID = worksheet.Cells[row, 3].Value.ToString(),
-                    CorpCode = worksheet.Cells[row, 5].Value.ToString(),
-                    EffectiveDate = worksheet.Cells[row, 6].Value.ToString(),
-                    TerminationDate = worksheet.Cells[row, 7].Value.ToString(),
-                    ActiveFlag = worksheet.Cells[row, 8].Value.ToString(),
-                    ShortName = worksheet.Cells[row, 9].Value.ToString(),
-                    LongName = worksheet.Cells[row, 10].Value.ToString(),
-                    Remarks = worksheet.Cells[row, 12].Value.ToString(),
-                    PolicyNo = worksheet.Cells[row, 13].Value.ToString(),
-                    FrequencyCode = worksheet.Cells[row, 15].Value.ToString(),
-                    LimitCode = worksheet.Cells[row, 16].Value.ToString(),
-                    MaxValue = worksheet.Cells[row, 18].Value.ToString(),
-                    FamilyLimit = worksheet.Cells[row, 20].Value.ToString(),
-                    PrintText = worksheet.Cells[row, 22].Value.ToString()
-                };
-                evm.PlanData.Add(pl);
+                // Sheet 1 Plan
+                plans = ws0
+                    .Extract<PlanUploadModel>()
+                    .WithProperty(p => p.PayorCode, "A")
+                    .WithProperty(p => p.PlanId, "B")
+                    .WithProperty(p => p.CorpCode, "D")
+                    .WithProperty(p => p.EffectiveDate, "E")
+                    .WithProperty(p => p.TerminationDate, "F")
+                    .WithProperty(p => p.ActiveFlag, "G")
+                    .WithProperty(p => p.ShortName, "H")
+                    .WithProperty(p => p.LongName, "I")
+                    .WithProperty(p => p.Remarks, "K")
+                    .WithProperty(p => p.PolicyNo, "L")
+                    .WithProperty(p => p.FrequencyCode, "N")
+                    .WithProperty(p => p.LimitCode, "O")
+                    .WithProperty(p => p.MaxValue, "Q")
+                    .WithProperty(p => p.FamilyMaxValue, "S")
+                    .WithProperty(p => p.PrintText, "U")
+                    .GetData(2, ws0.Dimension.Rows)
+                    .ToList();
+                ws0.Dispose();
+                plans.RemoveAll(x => string.IsNullOrWhiteSpace(x.PayorCode));
+
+                // Sheet 2 Coverage
+                ws0 = package.Workbook.Worksheets[1];
+                covs = ws0
+                    .Extract<CoverageUploadModel>()
+                    .WithProperty(p => p.PlanId, "A")
+                    .WithProperty(p => p.CorpCode, "B")
+                    .WithProperty(p => p.CoverageCode, "C")
+                    .WithProperty(p => p.ActiveFlag, "D")
+                    .WithProperty(p => p.ClientCoverageCode, "E")
+                    .WithProperty(p => p.LimitCode, "G")
+                    .WithProperty(p => p.FrequencyCode, "H")
+                    .WithProperty(p => p.MinValue, "I")
+                    .WithProperty(p => p.MaxValue, "J")
+                    .WithProperty(p => p.FamilyValue, "K")
+                    .GetData(2, ws0.Dimension.Rows)
+                    .ToList();
+                ws0.Dispose();
+                covs.RemoveAll(x => string.IsNullOrWhiteSpace(x.PlanId));
+
+                // Sheet 3 Benefit
+                ws0 = package.Workbook.Worksheets[2];
+                benfs = ws0
+                    .Extract<BenefitUploadModel>()
+                    .WithProperty(p => p.PlanId, "A")
+                    .WithProperty(p => p.CorpCode, "B")
+                    .WithProperty(p => p.CoverageCode, "C")
+                    .WithProperty(p => p.BenefitCode, "D")
+                    .WithProperty(p => p.ActiveFlag, "E")
+                    .WithProperty(p => p.ConditionDescription, "F")
+                    .WithProperty(p => p.LOA_Description, "G")
+                    .WithProperty(p => p.ClientBenefitcode, "H")
+                    .WithProperty(p => p.MaxValue, "J")
+                    .WithProperty(p => p.LimitCode, "K")
+                    .WithProperty(p => p.FrequencyCode, "L")
+                    .WithProperty(p => p.MultipleCondition, "P")
+                    .GetData(2, ws0.Dimension.Rows)
+                    .ToList();
+                benfs.RemoveAll(x => string.IsNullOrWhiteSpace(x.PlanId));
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error Read Excel Sheet : " + ex.Message);
+            }
+            finally
+            {
+                ws0.Dispose();
+                package.Dispose();
+                _filestrm.Dispose();
             }
 
-            // Sheet 2 Coverage
-            worksheet = package.Workbook.Worksheets[1];
-            rowCount = worksheet.Dimension.Rows;
-            for (int row = 2; row <= rowCount; row++)
+
+            ///// Save Data To Database
+            try
             {
-                var cl = new CoverageFileData
+                using (var transaction = _contextStg.Database.BeginTransaction())
                 {
-
-                };
+                    _contextStg.BulkInsert(plans);
+                    _contextStg.BulkInsert(covs);
+                    _contextStg.BulkInsert(benfs);
+                    transaction.Commit();
+                }
             }
-
-                return evm;
+            catch (Exception ex) { throw new Exception("Error Bulk Insert : " + ex.Message); }
         }
     }
 }
