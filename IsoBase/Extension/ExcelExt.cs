@@ -15,26 +15,26 @@ namespace IsoBase.Extension
     public class ExcelExt
     {
         FileStream _filestrm;
-        private readonly StagingDbContext _contextStg;
+        int _clientID;
 
-        public ExcelExt(FileStream Filestrm, StagingDbContext contextStg)
+        public ExcelExt(FileStream Filestrm, int ClientID)
         {
             _filestrm = Filestrm;
-            _contextStg = contextStg;
+            _clientID = ClientID;
         }
 
-        public void ReadExcelEnrollPlan()
+        public EnrollPlanFileExcelDataVM ReadExcelEnrollPlan( ref EnrollPlanFileExcelDataVM evm)
         {
-            //var evm = new List<PlanUploadModel>();
+            //var evm = new EnrollPlanFileExcelDataVM();
             ExcelPackage package;
             try { package = new ExcelPackage(this._filestrm); }
             catch { throw new Exception("The file is not an valid Excel file. If the file is encrypted, please remove the password"); }
 
             if (package.Workbook.Worksheets.Count() < 3) throw new Exception("File must consist of 3 sheet (Plan,Coverage,Benefit)");
 
-            var plans = new List<PlanUploadModel>();
-            var covs = new List<CoverageUploadModel>();
-            var benfs = new List<BenefitUploadModel>();
+            var plans = new List<PlanUploadModel>(evm.ClientID);
+            var covs = new List<CoverageUploadModel>(evm.ClientID);
+            var benfs = new List<BenefitUploadModel>(evm.ClientID);
             ExcelWorksheet ws0 = package.Workbook.Worksheets[0];
             try
             {
@@ -59,7 +59,9 @@ namespace IsoBase.Extension
                     .GetData(2, ws0.Dimension.Rows)
                     .ToList();
                 ws0.Dispose();
+                plans.RemoveAll(x => x == null);
                 plans.RemoveAll(x => string.IsNullOrWhiteSpace(x.PayorCode));
+                evm.PlanUploadModel = plans;
 
                 // Sheet 2 Coverage
                 ws0 = package.Workbook.Worksheets[1];
@@ -78,7 +80,9 @@ namespace IsoBase.Extension
                     .GetData(2, ws0.Dimension.Rows)
                     .ToList();
                 ws0.Dispose();
+                covs.RemoveAll(x => x == null);
                 covs.RemoveAll(x => string.IsNullOrWhiteSpace(x.PlanId));
+                evm.CoverageUploadModel = covs;
 
                 // Sheet 3 Benefit
                 ws0 = package.Workbook.Worksheets[2];
@@ -98,7 +102,9 @@ namespace IsoBase.Extension
                     .WithProperty(p => p.MultipleCondition, "P")
                     .GetData(2, ws0.Dimension.Rows)
                     .ToList();
+                benfs.RemoveAll(x => x == null);
                 benfs.RemoveAll(x => string.IsNullOrWhiteSpace(x.PlanId));
+                evm.BenefitUploadModel = benfs;
             }
             catch (Exception ex)
             {
@@ -110,20 +116,7 @@ namespace IsoBase.Extension
                 package.Dispose();
                 _filestrm.Dispose();
             }
-
-
-            ///// Save Data To Database
-            try
-            {
-                using (var transaction = _contextStg.Database.BeginTransaction())
-                {
-                    _contextStg.BulkInsert(plans);
-                    _contextStg.BulkInsert(covs);
-                    _contextStg.BulkInsert(benfs);
-                    transaction.Commit();
-                }
-            }
-            catch (Exception ex) { throw new Exception("Error Bulk Insert : " + ex.Message); }
+            return evm;
         }
     }
 }

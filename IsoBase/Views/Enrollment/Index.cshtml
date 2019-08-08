@@ -16,6 +16,7 @@
     <thead class="ui-widget-header">
         <tr>
             <th>No</th>
+            <th>ClientID</th>
             <th>ClientCode</th>
             <th>ClientName</th>
             <th>Action</th>
@@ -23,7 +24,8 @@
     </thead>
     <tfoot>
         <tr>
-            <th class="search"></th> 
+            <th class="search"></th>
+            <th class="search"></th>
             <th class="search"></th>
             <th class="search"></th>
             <th class="search"></th>
@@ -56,6 +58,7 @@
                 { data: "No","width": "5px",className: "dt-right",
                     render: function (data, type, row, meta) { return meta.row + meta.settings._iDisplayStart + 1; }
                 },
+                { data: "clientID" },
                 { data: "clientCode" },
                 { data: "clientName" },
                 { data: "clientID",className: "dt-center" ,"width": "10px",

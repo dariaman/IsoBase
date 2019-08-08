@@ -37,7 +37,7 @@ namespace IsoBase
             });
 
             services.AddDbContext<UserDbContext>(options =>options.UseSqlServer(Configuration.GetConnectionString("IsoUser")));
-            services.AddDbContext<StagingDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("IsoStaging")));
+            //services.AddDbContext<StagingDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("IsoStaging")));
             services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("IsoDB")));
 
             services.AddSingleton<ITempDataProvider, CookieTempDataProvider>();

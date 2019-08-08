@@ -15,6 +15,13 @@ namespace IsoBase.Data
         {
         }
 
+        /// <summary>
+        ///  ViewModel Mapping
+        /// </summary>
+        public DbSet<PlanUploadVM> PlanUploadVM { get; set; }
+        public DbSet<CoverageUploadVM> CoverageUploadVM { get; set; }
+        public DbSet<BenefitUploadVM> BenefitUploadVM { get; set; }
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             builder.Entity<ClientModel>(b => {
@@ -27,9 +34,26 @@ namespace IsoBase.Data
                 b.Property(u => u.IsActive).HasDefaultValueSql("1");
                 b.Property(u => u.DateCreate).HasDefaultValueSql("getdate()");
             });
+            builder.Entity<PlanUploadModel>(b =>
+            {
+                b.HasKey(u => u.ID);
+                b.Property(u => u.RecType).HasDefaultValue("1");
+                b.Property(u => u.UploadDate).HasDefaultValueSql(" getdate() ");
+            });
             base.OnModelCreating(builder);
         }
 
+        /// <summary>
+        /// Table Staging Upload
+        /// </summary>
+        public DbSet<PlanUploadModel> PlanUploadModel { get; set; }
+        public DbSet<CoverageUploadModel> CoverageUploadModel { get; set; }
+        public DbSet<BenefitUploadModel> BenefitUploadModel { get; set; }
+
+
+        /// <summary>
+        /// Table Production Non Staging
+        /// </summary>
         public DbSet<BenefitCodesModel> BenefitCodesModel { get; set; }
         public DbSet<ClientModel> ClientModel { get; set; }
         public DbSet<ClientTypeModel> ClientTypeModel { get; set; }

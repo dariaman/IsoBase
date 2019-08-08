@@ -19,21 +19,20 @@ using OfficeOpenXml;
 using EFCore.BulkExtensions;
 using Microsoft.AspNetCore.Identity;
 using System.Security.Claims;
+using Microsoft.EntityFrameworkCore;
 
 namespace IsoBase.Controllers
 {
     public class EnrollmentController : Controller
     {
         private readonly ApplicationDbContext _context;
-        private readonly StagingDbContext _contextStg;
-        private IFlashMessage flashMessage;
+        private readonly IFlashMessage flashMessage;
         private static string paternAngka { get; } = @"[^0-9]";
 
 
-        public EnrollmentController(ApplicationDbContext context, StagingDbContext contextStg, IFlashMessage flash)
+        public EnrollmentController(ApplicationDbContext context, IFlashMessage flash)
         {
             _context = context;
-            _contextStg = contextStg;
             flashMessage = flash;
         }
 
@@ -67,8 +66,6 @@ namespace IsoBase.Controllers
         public async Task<IActionResult> UploadFilePlan([Bind("ID,Fileupload")] UploadFilePlanVM ClientfilePlan)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-
             string _urlBack = (Request.Headers["Referer"].ToString() == "" ? "Index" : Request.Headers["Referer"].ToString());
 
             try
@@ -79,22 +76,28 @@ namespace IsoBase.Controllers
                 FileUploadExt uplExt = new FileUploadExt();
                 FileStream Filestrm;
                 ExcelExt excelRead;
-                //List<PlanUploadModel> enroll;
 
                 // upload file ke server
                 // Param 1 untuk file Plan excel 
                 try { Filestrm = await uplExt.BackupFile(1, ClientfilePlan.Fileupload); }
-                catch (Exception ex){ throw new Exception(ex.Message); }
+                catch (Exception ex) { throw new Exception(ex.Message); }
 
                 //// Copy File To Server
-                try { excelRead = new ExcelExt(Filestrm, _contextStg); }
+                try { excelRead = new ExcelExt(Filestrm, ClientfilePlan.ID); }
                 catch (Exception ex) { throw new Exception("Error Send File : " + ex.Message); }
 
-                //// Read Cell Value and insert to DB
-                try {  excelRead.ReadExcelEnrollPlan(); }
+                //// Read Cell Value to VM
+                var EnrolPlan = new EnrollPlanFileExcelDataVM(ClientfilePlan.ID);
+                try { excelRead.ReadExcelEnrollPlan(ref EnrolPlan); }
                 catch (Exception ex) { throw new Exception("Error Read Excel : " + ex.Message); }
-                
-                
+
+                // Proses pembersihan data dan generate error Upload 
+                ValidasiFileUploadPlan(ref EnrolPlan);
+
+                // Save To DB
+                try { DeleteOld_SaveNewPlanToDB(EnrolPlan); }
+                catch (Exception ex) { throw new Exception("Error Bulk Insert : " + ex.Message); }
+
                 flashMessage.Confirmation("Upload Success");
             }
             catch (Exception ex)
@@ -103,7 +106,6 @@ namespace IsoBase.Controllers
             }
             return Redirect(_urlBack);
         }
-
 
         public IActionResult Member()
         {
@@ -160,71 +162,186 @@ namespace IsoBase.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult PlanByClientListAll([DataTablesRequest] DataTablesRequest dataRequest, string clientID)
+        public async Task<IActionResult> PlanUploadListByClient([DataTablesRequest] DataTablesRequest dataRequest, string clientID)
         {
-            var pgData = new PageData(dataRequest, _context)
-            {
-                select = @"SELECT pl.ID,pl.ClientID,pl.ClientPlanID,pl.PolicyNo,pl.ShortName,pl.LongName,fc.Description Frequency,lc.Description Limit, 
-                            pl.MaxLimitValue,pl.IsActive,pl.UserCreate,pl.DateCreate ",
-                Tabel = @" FROM dbo.PlanLimit pl
-                            INNER JOIN dbo.FrequencyCodes fc ON fc.ID = pl.FrequencyCodeID
-                            INNER JOIN dbo.LimitCodes lc ON lc.ID = pl.LimitCodeID
-                            WHERE pl.ClientID=1 ",
-            };
+            var _clntID = Regex.Replace(clientID.Trim(), paternAngka, "");
+            var query = string.Format(@"SELECT pu.ID,pu.ClientID,pu.RecType,pu.PayorCode,pu.PlanId,pu.CorpCode,pu.EffectiveDate,pu.TerminationDate,pu.ActiveFlag,
+                            pu.ShortName,pu.LongName,pu.Remarks,pu.PolicyNo,fc.Description FrequencyCode,lc.Description LimitCode,pu.MaxValue,
+                            pu.FamilyMaxValue,pu.PrintText,pu.UploadDate,pu.UserUpload,pu.ErrorMessage 
+                        FROM stg.PlanUpload pu
+                            LEFT JOIN FrequencyCodes fc ON fc.ID = pu.FrequencyCode
+                            LEFT JOIN LimitCodes lc ON lc.ID = pu.LimitCode
+                            WHERE pu.ClientID={0}  ", _clntID);
 
-            //defenisikan Where condition
-            foreach (var req in dataRequest.Columns)
-            {
-                if (string.IsNullOrEmpty(req.SearchValue)) continue;
-                else if (req.Data == "id") pgData.AddWhereRegex(pgData.paternAngkaLike, req.SearchValue, "ID");
-                else if (req.Data == "clientID") pgData.AddWhereRegex(pgData.paternAngkaHurufLike, req.SearchValue, "ClientID");
-                else if (req.Data == "policyNo") pgData.AddWhereRegex(pgData.paternAngka, req.SearchValue, "PolicyNo");
-                else if (req.Data == "planCode") pgData.AddWhereRegex(pgData.paternAngka, req.SearchValue, "PlanCode");
-            }
-            pgData.CountData(); // hitung jlh total data dan total dataFilter
-
-            DataTable _dt = new DataTable();
+            var ls = new List<PlanUploadVM>();
             try
             {
-                _dt = pgData.ListData();
-            }
-            catch (Exception ex) { flashMessage.Info(ex.Message); }
-
-            List<PlanVM> ls = new List<PlanVM>();
-            try
-            {
-                foreach (DataRow row in _dt.Rows)
-                {
-                    ls.Add(new PlanVM
-                    {
-                        ID = row["ID"].ToString(),
-                        ClientID = row["ClientID"].ToString(),
-                        PolicyNo = row["PolicyNo"].ToString(),
-                        ClientPlanID = row["PlanCode"].ToString(),
-
-                        ShortName = row["ShortName"].ToString(),
-                        LongName = row["LongName"].ToString(),
-                        Frequency = row["Frequency"].ToString(),
-                        Limit = row["Limit"].ToString(),
-                        MaxLimitValue = row["MaxLimitValue"].ToString(),
-
-                        IsActive = row["IsActive"].ToString(),
-                        UserCreate = row["UserCreate"].ToString(),
-                        DateCreate = row["DateCreate"].ToString(),
-                    });
-                };
+                ls = await _context.Set<PlanUploadVM>().FromSql(query).ToListAsync();
             }
             catch (Exception ex)
             {
-                flashMessage.Info(ex.Message);
-                //throw new Exception(ex.Message);
+                flashMessage.Danger("Error Paging Plan : " + ex.Message);
             }
-            return Json(ls.ToDataTablesResponse(dataRequest, pgData.recordsTotal, pgData.recordsFilterd));
+
+            return Json(ls.ToDataTablesResponse(dataRequest, ls.Count, ls.Count));
         }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CoverageUploadListByClient([DataTablesRequest] DataTablesRequest dataRequest, string clientID)
+        {
+            var _clntID = Regex.Replace(clientID.Trim(), paternAngka, "");
+            var query = string.Format(@"SELECT cu.ID,cu.ClientID,cu.RecType,cu.PlanId,cu.CorpCode,cu.CoverageCode,cu.ActiveFlag,
+                                        cu.ClientCoverageCode,lc.Description LimitCode,fc.Description FrequencyCode,cu.MinValue,cu.MaxValue,
+                                        cu.FamilyValue,cu.UploadDate,cu.UserUpload,cu.ErrorMessage 
+                                    FROM stg.CoverageUpload cu
+                                    LEFT JOIN FrequencyCodes fc ON fc.ID = cu.FrequencyCode
+                                    LEFT JOIN LimitCodes lc ON lc.ID = Cu.LimitCode
+                                    WHERE cu.ClientID={0} ", _clntID);
+
+            var ls = new List<CoverageUploadVM>();
+            try
+            {
+                ls = await _context.Set<CoverageUploadVM>().FromSql(query).ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                flashMessage.Danger("Error Paging Coverage : " + ex.Message);
+            }
+
+
+            return Json(ls.ToDataTablesResponse(dataRequest, ls.Count, ls.Count));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> BenefitUploadListByClient([DataTablesRequest] DataTablesRequest dataRequest, string clientID)
+        {
+            var _clntID = Regex.Replace(clientID.Trim(), paternAngka, "");
+            var query = string.Format(@"SELECT bu.ID,bu.ClientID,bu.RecType,bu.PlanId,bu.CorpCode,cc.ShortName CoverageCode,bu.BenefitCode,bc.Code BenefitShortName,
+                                    bc.Description BenefitDescription,bu.ActiveFlag,bu.ConditionDescription,bu.LOA_Description,bu.ClientBenefitcode,
+                                    lc.Description LimitCode,fc.Description FrequencyCode,bu.MaxValue,bu.MultipleCondition,bu.UploadDate,bu.UserUpload,bu.ErrorMessage
+                                FROM stg.BenefitUpload bu
+                                LEFT JOIN dbo.CoverageCodes cc ON cc.ID = bu.CoverageCode
+                                LEFT JOIN dbo.BenefitCodes bc ON bc.ID = bu.BenefitCode
+                                LEFT JOIN FrequencyCodes fc ON fc.ID = bu.FrequencyCode
+                                LEFT JOIN LimitCodes lc ON lc.ID = bu.LimitCode
+                                    WHERE bu.ClientID={0} ", _clntID);
+            var ls = new List<BenefitUploadVM>();
+            try
+            {
+                ls = await _context.Set<BenefitUploadVM>().FromSql(query).ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                flashMessage.Danger("Error Paging benefit : " + ex.Message);
+            }
+
+            return Json(ls.ToDataTablesResponse(dataRequest, ls.Count, ls.Count));
+        }
+
 
         private ClientModel ClientFindByID(int id)
         {
             return _context.ClientModel.Where(x => x.ID == id).FirstOrDefault();
+        }
+
+        private void ValidasiFileUploadPlan(ref EnrollPlanFileExcelDataVM pln)
+        {
+            var CleanPlan = new EnrollPlanFileExcelDataVM(pln.ClientID);
+            CleanPlan.PlanUploadModel = new List<PlanUploadModel>();
+            CleanPlan.CoverageUploadModel = new List<CoverageUploadModel>();
+            CleanPlan.BenefitUploadModel = new List<BenefitUploadModel>();
+
+            foreach (var item in pln.PlanUploadModel)
+            {
+                var newItem = new PlanUploadModel(pln.ClientID);
+                newItem.PayorCode = (item.PayorCode ?? "").Trim();
+                newItem.PlanId = (item.PlanId ?? "").Trim();
+                newItem.CorpCode = (item.CorpCode ?? "").Trim();
+                newItem.EffectiveDate = (item.EffectiveDate ?? "").Trim();
+                newItem.TerminationDate = (item.TerminationDate ?? "").Trim();
+                newItem.ActiveFlag = (item.ActiveFlag ?? "").Trim();
+                newItem.ShortName = (item.ShortName ?? "").Trim();
+                newItem.LongName = (item.LongName ?? "").Trim();
+                newItem.Remarks = (item.Remarks ?? "").Trim();
+                newItem.PolicyNo = (item.PolicyNo ?? "").Trim();
+                newItem.FrequencyCode = (item.FrequencyCode ?? "").Trim();
+                newItem.LimitCode = (item.LimitCode ?? "").Trim();
+                newItem.MaxValue = (item.MaxValue ?? "").Trim();
+                newItem.FamilyMaxValue = (item.FamilyMaxValue ?? "").Trim();
+                newItem.PrintText = (item.PrintText ?? "").Trim();
+                newItem.UploadDate = item.UploadDate;
+                newItem.UserUpload = item.UserUpload;
+                newItem.ErrorMessage = item.ErrorMessage;
+                CleanPlan.PlanUploadModel.Add(newItem);
+            }
+            pln.PlanUploadModel.Clear();
+
+            foreach (var item in pln.CoverageUploadModel)
+            {
+                var newItem = new CoverageUploadModel(pln.ClientID);
+                newItem.PlanId = (item.PlanId ?? "").Trim();
+                newItem.CorpCode = (item.CorpCode ?? "").Trim();
+                newItem.CoverageCode = (item.CoverageCode ?? "").Trim();
+                newItem.ActiveFlag = (item.ActiveFlag ?? "").Trim();
+                newItem.ClientCoverageCode = (item.ClientCoverageCode ?? "").Trim();
+                newItem.LimitCode = (item.LimitCode ?? "").Trim();
+                newItem.FrequencyCode = (item.FrequencyCode ?? "").Trim();
+                newItem.MinValue = (item.MinValue ?? "").Trim();
+                newItem.MaxValue = (item.MaxValue ?? "").Trim();
+                newItem.FamilyValue = (item.FamilyValue ?? "").Trim();
+                newItem.UploadDate = item.UploadDate;
+                newItem.UserUpload = item.UserUpload;
+                newItem.ErrorMessage = item.ErrorMessage;
+                CleanPlan.CoverageUploadModel.Add(newItem);
+            }
+            pln.CoverageUploadModel.Clear();
+
+            foreach (var item in pln.BenefitUploadModel)
+            {
+                var newItem = new BenefitUploadModel(pln.ClientID);
+
+                newItem.PlanId = (item.PlanId ?? "").Trim();
+                newItem.CorpCode = (item.CorpCode ?? "").Trim();
+                newItem.CoverageCode = (item.CoverageCode ?? "").Trim();
+                newItem.BenefitCode = (item.BenefitCode ?? "").Trim();
+                newItem.ActiveFlag = (item.ActiveFlag ?? "").Trim();
+                newItem.ConditionDescription = (item.ConditionDescription ?? "").Trim();
+                newItem.LOA_Description = (item.LOA_Description ?? "").Trim();
+                newItem.ClientBenefitcode = (item.ClientBenefitcode ?? "").Trim();
+                newItem.MaxValue = (item.MaxValue ?? "").Trim();
+                newItem.LimitCode = (item.LimitCode ?? "").Trim();
+                newItem.FrequencyCode = (item.FrequencyCode ?? "").Trim();
+                newItem.MultipleCondition = (item.MultipleCondition ?? "").Trim();
+                newItem.UploadDate = item.UploadDate;
+                newItem.UserUpload = item.UserUpload;
+                newItem.ErrorMessage = item.ErrorMessage;
+                CleanPlan.BenefitUploadModel.Add(newItem);
+            }
+            pln.BenefitUploadModel.Clear();
+
+            pln = CleanPlan;
+        }
+
+        private void DeleteOld_SaveNewPlanToDB(EnrollPlanFileExcelDataVM clPrd)
+        {
+            ///// Save Data To Database
+            try
+            {
+                using (var transaction = _context.Database.BeginTransaction())
+                {
+                    _context.PlanUploadModel.Where(a => a.ClientID == clPrd.ClientID).BatchDelete();
+                    _context.CoverageUploadModel.Where(a => a.ClientID == clPrd.ClientID).BatchDelete();
+                    _context.BenefitUploadModel.Where(a => a.ClientID == clPrd.ClientID).BatchDelete();
+
+                    _context.BulkInsert(clPrd.PlanUploadModel);
+                    _context.BulkInsert(clPrd.CoverageUploadModel);
+                    _context.BulkInsert(clPrd.BenefitUploadModel);
+                    transaction.Commit();
+                }
+            }
+            catch (Exception ex) { throw new Exception(ex.Message); }
         }
 
     }
