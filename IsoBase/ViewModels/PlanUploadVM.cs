@@ -1,6 +1,4 @@
 ﻿
-using System;
-
 namespace IsoBase.ViewModels
 {
     public class PlanUploadVM
@@ -23,7 +21,7 @@ namespace IsoBase.ViewModels
         public string MaxValue { get; set; }
         public string FamilyMaxValue { get; set; }
         public string PrintText { get; set; }
-        public DateTime UploadDate { get; set; }
+        public string UploadDate { get; set; }
         public string UserUpload { get; set; }
         public string ErrorMessage { get; set; }
     }

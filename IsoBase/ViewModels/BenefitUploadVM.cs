@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
+﻿
 namespace IsoBase.ViewModels
 {
     public class BenefitUploadVM
@@ -24,7 +20,7 @@ namespace IsoBase.ViewModels
         public string FrequencyCode { get; set; }
         public string MaxValue { get; set; }
         public string MultipleCondition { get; set; }
-        public DateTime UploadDate { get; set; }
+        public string UploadDate { get; set; }
         public string UserUpload { get; set; }
         public string ErrorMessage { get; set; }
     }

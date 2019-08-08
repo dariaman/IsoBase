@@ -29,7 +29,6 @@ namespace IsoBase.Controllers
         private readonly IFlashMessage flashMessage;
         private static string paternAngka { get; } = @"[^0-9]";
 
-
         public EnrollmentController(ApplicationDbContext context, IFlashMessage flash)
         {
             _context = context;
@@ -167,7 +166,8 @@ namespace IsoBase.Controllers
             var _clntID = Regex.Replace(clientID.Trim(), paternAngka, "");
             var query = string.Format(@"SELECT pu.ID,pu.ClientID,pu.RecType,pu.PayorCode,pu.PlanId,pu.CorpCode,pu.EffectiveDate,pu.TerminationDate,pu.ActiveFlag,
                             pu.ShortName,pu.LongName,pu.Remarks,pu.PolicyNo,fc.Description FrequencyCode,lc.Description LimitCode,pu.MaxValue,
-                            pu.FamilyMaxValue,pu.PrintText,pu.UploadDate,pu.UserUpload,pu.ErrorMessage 
+                            pu.FamilyMaxValue,pu.PrintText,CONCAT(CONVERT(VARCHAR(30),pu.UploadDate,106),' ',CONVERT(VARCHAR(30),pu.UploadDate,108)) UploadDate,
+                            pu.UserUpload,pu.ErrorMessage 
                         FROM stg.PlanUpload pu
                             LEFT JOIN FrequencyCodes fc ON fc.ID = pu.FrequencyCode
                             LEFT JOIN LimitCodes lc ON lc.ID = pu.LimitCode
@@ -193,7 +193,8 @@ namespace IsoBase.Controllers
             var _clntID = Regex.Replace(clientID.Trim(), paternAngka, "");
             var query = string.Format(@"SELECT cu.ID,cu.ClientID,cu.RecType,cu.PlanId,cu.CorpCode,cu.CoverageCode,cu.ActiveFlag,
                                         cu.ClientCoverageCode,lc.Description LimitCode,fc.Description FrequencyCode,cu.MinValue,cu.MaxValue,
-                                        cu.FamilyValue,cu.UploadDate,cu.UserUpload,cu.ErrorMessage 
+                                        cu.FamilyValue,CONCAT(CONVERT(VARCHAR(30),cu.UploadDate,106),' ',CONVERT(VARCHAR(30),cu.UploadDate,108)) UploadDate,
+                                        cu.UserUpload,cu.ErrorMessage 
                                     FROM stg.CoverageUpload cu
                                     LEFT JOIN FrequencyCodes fc ON fc.ID = cu.FrequencyCode
                                     LEFT JOIN LimitCodes lc ON lc.ID = Cu.LimitCode
@@ -220,7 +221,9 @@ namespace IsoBase.Controllers
             var _clntID = Regex.Replace(clientID.Trim(), paternAngka, "");
             var query = string.Format(@"SELECT bu.ID,bu.ClientID,bu.RecType,bu.PlanId,bu.CorpCode,cc.ShortName CoverageCode,bu.BenefitCode,bc.Code BenefitShortName,
                                     bc.Description BenefitDescription,bu.ActiveFlag,bu.ConditionDescription,bu.LOA_Description,bu.ClientBenefitcode,
-                                    lc.Description LimitCode,fc.Description FrequencyCode,bu.MaxValue,bu.MultipleCondition,bu.UploadDate,bu.UserUpload,bu.ErrorMessage
+                                    lc.Description LimitCode,fc.Description FrequencyCode,bu.MaxValue,bu.MultipleCondition,
+                                    CONCAT(CONVERT(VARCHAR(30),bu.UploadDate,106),' ',CONVERT(VARCHAR(30),bu.UploadDate,108)) UploadDate,bu.UserUpload,
+                                    bu.ErrorMessage
                                 FROM stg.BenefitUpload bu
                                 LEFT JOIN dbo.CoverageCodes cc ON cc.ID = bu.CoverageCode
                                 LEFT JOIN dbo.BenefitCodes bc ON bc.ID = bu.BenefitCode
@@ -239,7 +242,6 @@ namespace IsoBase.Controllers
 
             return Json(ls.ToDataTablesResponse(dataRequest, ls.Count, ls.Count));
         }
-
 
         private ClientModel ClientFindByID(int id)
         {

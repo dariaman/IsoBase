@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
+﻿
 namespace IsoBase.ViewModels
 {
     public class CoverageUploadVM
@@ -20,7 +16,7 @@ namespace IsoBase.ViewModels
         public string MinValue { get; set; }
         public string MaxValue { get; set; }
         public string FamilyValue { get; set; }
-        public DateTime UploadDate { get; set; }
+        public string UploadDate { get; set; }
         public string UserUpload { get; set; }
         public string ErrorMessage { get; set; }
     }
