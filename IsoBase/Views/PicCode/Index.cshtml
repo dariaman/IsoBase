@@ -34,7 +34,7 @@
         </tr>
     </tfoot>
 </table>
-<a id="createnew" class="btn btn-success" >Add New</a>
+<a class="btn btn-success" asp-action="Create">Add New</a>
 
 <script>
 $(document).ready(function () {
@@ -104,14 +104,6 @@ $(document).ready(function () {
                     that.search(this.value).draw();
                 }
             }
-        });
-    });
-
-    $('#createnew').click(function () {
-        var url = '@Url.Action("Create","PicCode")';
-        $.get(url, function (data) {
-            $("#myModal").html(data);
-            $("#myModal").modal('show');
         });
     });
 

@@ -73,5 +73,6 @@ namespace IsoBase.Data
         public DbSet<BenefitLimitValueModel> BenefitLimitValueModel { get; set; }
         public DbSet<MemberModel> MemberModel { get; set; }
         public DbSet<PicCodeModel> PicCodeModel { get; set; }
+        public DbSet<IsoBase.Models.ClientPicModel> ClientPicModel { get; set; }
     }
 }

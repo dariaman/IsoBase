@@ -1,0 +1,100 @@
+﻿@model IsoBase.Models.ClientPicModel
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h1>Create</h1>
+
+<h4>ClientPicModel</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="ClientID" class="control-label"></label>
+                <input asp-for="ClientID" class="form-control" />
+                <span asp-validation-for="ClientID" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PicCodeID" class="control-label"></label>
+                <input asp-for="PicCodeID" class="form-control" />
+                <span asp-validation-for="PicCodeID" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PicName" class="control-label"></label>
+                <input asp-for="PicName" class="form-control" />
+                <span asp-validation-for="PicName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PicTitle" class="control-label"></label>
+                <input asp-for="PicTitle" class="form-control" />
+                <span asp-validation-for="PicTitle" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="AddressBuilding" class="control-label"></label>
+                <input asp-for="AddressBuilding" class="form-control" />
+                <span asp-validation-for="AddressBuilding" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Phone" class="control-label"></label>
+                <input asp-for="Phone" class="form-control" />
+                <span asp-validation-for="Phone" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PhoneExt" class="control-label"></label>
+                <input asp-for="PhoneExt" class="form-control" />
+                <span asp-validation-for="PhoneExt" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="HP" class="control-label"></label>
+                <input asp-for="HP" class="form-control" />
+                <span asp-validation-for="HP" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Email" class="control-label"></label>
+                <input asp-for="Email" class="form-control" />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Fax" class="control-label"></label>
+                <input asp-for="Fax" class="form-control" />
+                <span asp-validation-for="Fax" class="text-danger"></span>
+            </div>
+            <div class="form-group form-check">
+                <label class="form-check-label">
+                    <input class="form-check-input" asp-for="IsActive" /> @Html.DisplayNameFor(model => model.IsActive)
+                </label>
+            </div>
+            <div class="form-group">
+                <label asp-for="UserCreate" class="control-label"></label>
+                <input asp-for="UserCreate" class="form-control" />
+                <span asp-validation-for="UserCreate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="DateCreate" class="control-label"></label>
+                <input asp-for="DateCreate" class="form-control" />
+                <span asp-validation-for="DateCreate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="UserUpdate" class="control-label"></label>
+                <input asp-for="UserUpdate" class="form-control" />
+                <span asp-validation-for="UserUpdate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="DateUpdate" class="control-label"></label>
+                <input asp-for="DateUpdate" class="form-control" />
+                <span asp-validation-for="DateUpdate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+

@@ -9,16 +9,19 @@ using IsoBase.Data;
 using IsoBase.Models;
 using DataTables.AspNetCore.Mvc.Binder;
 using IsoBase.ViewModels;
+using Vereyon.Web;
 
 namespace IsoBase.Controllers
 {
     public class PicCodeController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly IFlashMessage flashMessage;
 
-        public PicCodeController(ApplicationDbContext context)
+        public PicCodeController(ApplicationDbContext context, IFlashMessage flash)
         {
             _context = context;
+            flashMessage = flash;
         }
 
         // GET: PicCode
@@ -45,7 +48,7 @@ namespace IsoBase.Controllers
 
         public IActionResult Create()
         {
-            return PartialView();
+            return View();
         }
 
         [HttpPost]
@@ -58,22 +61,22 @@ namespace IsoBase.Controllers
                 PicCodeModel Picm = new PicCodeModel();
                 Picm.PicDesc = cpm.PicDesc;
                 Picm.Remark = cpm.Remark;
-                Picm.IsActive = true;
-                Picm.UserCreate = "";
-                Picm.DateCreate = DateTime.Now;
+                //Picm.IsActive = true;
+                //Picm.UserCreate = "";
+                //Picm.DateCreate = DateTime.Now;
 
                 _context.Add(Picm);
                 try
                 {
                     await _context.SaveChangesAsync();
-                    return RedirectToAction(nameof(Index));
+                    return RedirectToAction("Index");
                 }
                 catch (Exception ex)
                 {
-                    return PartialView(cpm);
+                    flashMessage.Danger(ex.Message);
                 }
             }
-            return PartialView("Create", cpm);
+            return View(cpm);
         }
 
         // GET: PicCode/Edit/5
