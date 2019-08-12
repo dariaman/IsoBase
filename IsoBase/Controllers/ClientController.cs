@@ -9,6 +9,7 @@ using IsoBase.Models;
 using DataTables.AspNetCore.Mvc.Binder;
 using System.Data;
 using IsoBase.ViewModels;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace IsoBase.Controllers
 {
@@ -99,26 +100,51 @@ namespace IsoBase.Controllers
             return View(clientMasterModels);
         }
 
+
+
         // GET: ClientMaster/Create
         public IActionResult Create()
         {
+            ViewBag.ClientTypeList = _context.ClientTypeModel.ToList().Select(u => new SelectListItem
+            {
+                Text = u.Name,
+                Value = u.ID.ToString()
+            });
+
+
             return View();
         }
 
-        // POST: ClientMaster/Create
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ClientID,ClientCode,Name,ClientTypeID,IsActive,UserCreate,DateCreate,UserUpdate,DateUpdate")] ClientModel clientMasterModels)
+        public async Task<IActionResult> Create([Bind("ClientCode,Name,ClientTypeID,Building,Address,Phone,Fax,Email")] ClientCreateVM cvm)
         {
             if (ModelState.IsValid)
             {
+                ClientModel clientMasterModels = new ClientModel
+                {
+                    ClientCode = cvm.ClientCode,
+                    Name = cvm.Name,
+                    ClientTypeID = cvm.ClientTypeID,
+                    Building = cvm.Building,
+                    Address = cvm.Address,
+                    Phone = cvm.Phone,
+                    Fax = cvm.Fax,
+                    Email = cvm.Email
+                };
+                //clientMasterModels = cvm;
                 _context.Add(clientMasterModels);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(clientMasterModels);
+
+            ViewBag.ClientTypeList = _context.ClientTypeModel.ToList().Select(u => new SelectListItem
+            {
+                Text = u.Name,
+                Value = u.ID.ToString()
+            });
+
+            return View(cvm);
         }
 
         // GET: ClientMaster/Edit/5

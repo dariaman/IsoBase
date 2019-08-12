@@ -61,9 +61,6 @@ namespace IsoBase.Controllers
                 PicCodeModel Picm = new PicCodeModel();
                 Picm.PicDesc = cpm.PicDesc;
                 Picm.Remark = cpm.Remark;
-                //Picm.IsActive = true;
-                //Picm.UserCreate = "";
-                //Picm.DateCreate = DateTime.Now;
 
                 _context.Add(Picm);
                 try

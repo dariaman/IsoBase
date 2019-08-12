@@ -7,7 +7,6 @@ namespace IsoBase.ViewModels
 
         [Required]
         public string PicDesc { get; set; }
-        [Required]
         public string Remark { get; set; }
     }
 }

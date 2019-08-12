@@ -4,24 +4,39 @@
     ViewData["Title"] = "Create New Pic Code";
 }
 
-    <div class="row">
-        <div class="col-md-4">
-            <form asp-action="Create">
-                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                <div class="form-group">
-                    <label asp-for="PicDesc" class="control-label"></label>
-                    <input asp-for="PicDesc" class="form-control" />
-                    <span asp-validation-for="PicDesc" class="text-danger"></span>
-                </div>
-                <div class="form-group">
-                    <label asp-for="Remark" class="control-label"></label>
-                    <input asp-for="Remark" class="form-control" />
-                    <span asp-validation-for="Remark" class="text-danger"></span>
-                </div>
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+            </div>
+            <div class="modal-body">
+                @using (Html.BeginForm("Create", "PicCode", FormMethod.Post, new { id = "form-edit" }))
+                {
+                    @Html.ValidationSummary(true)
+                    <div class="form-group ">
+                        <div class="form-group form-inline">
+                            <label asp-for="PicDesc" class="control-label col-md-3">Pic Code</label>
+                            <div class="col-md-9">
+                                <input asp-for="PicDesc" class="form-control" /><br>
+                                <span asp-validation-for="PicDesc" class="text-danger"></span>
+                            </div>
+                        </div>
 
-                <div class="form-group">
-                    <input type="submit" value="Create" class="btn btn-primary" />
-                </div>
-            </form>
+                        <div class="form-group form-inline">
+                            <label asp-for="Remark" class="control-label col-md-3">Remark</label>
+                            <div class="col-md-9">
+                                <textarea asp-for="Remark" class="form-control" cols="40"></textarea><br>
+                                <span asp-validation-for="Remark" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group" style="text-align:right;">
+                        <input type="submit" value="save" class="btn btn-primary" />
+                        <a class="btn btn-secondary" asp-action="Index">Cancel</a>
+                    </div>
+                }
+            </div>
+            <div class="modal-footer">
+            </div>
         </div>
     </div>
