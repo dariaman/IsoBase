@@ -40,6 +40,12 @@ namespace IsoBase.Data
                 b.Property(u => u.RecType).HasDefaultValue("1");
                 b.Property(u => u.UploadDate).HasDefaultValueSql(" getdate() ");
             });
+            builder.Entity<PicCodeModel>(b =>
+            {
+                b.HasKey(u => u.ID);
+                //b.Property(u => u.IsActive).HasDefaultValue("1");
+                b.Property(u => u.DateCreate).HasDefaultValueSql(" getdate() ");
+            });
             base.OnModelCreating(builder);
         }
 
@@ -66,5 +72,6 @@ namespace IsoBase.Data
         public DbSet<BenefitModel> BenefitModel { get; set; }
         public DbSet<BenefitLimitValueModel> BenefitLimitValueModel { get; set; }
         public DbSet<MemberModel> MemberModel { get; set; }
+        public DbSet<PicCodeModel> PicCodeModel { get; set; }
     }
 }

@@ -184,7 +184,7 @@
     $(document).ready(function () {
         $('#tableplan').dataTable({
             "jQueryUI": true,
-            //processing: true,
+            buttons: [],
             initComplete: function () {
                 var r = $('#tableplan tfoot tr');
                 $('#tableplan thead').append(r);

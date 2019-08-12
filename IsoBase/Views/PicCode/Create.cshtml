@@ -1,0 +1,44 @@
+﻿@model IsoBase.Models.PicCodeModel
+
+@{
+    ViewData["Title"] = "Create New Pic Code";
+}
+
+<div class="modal-dialog" role="document">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title">Create New Pic Code</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+        </div>
+        <div class="modal-body">
+            @using (Html.BeginForm("Create", "PicCode", FormMethod.Post, new { id = "form-edit" }))
+            {
+                @Html.ValidationSummary(true)
+                <div class="form-group ">
+                    <div class="form-group form-inline">
+                        <label asp-for="PicDesc" class="control-label col-md-3">Pic Code</label>
+                        <div class="col-md-9">
+                            <input asp-for="PicDesc" class="form-control" />
+                            <span asp-validation-for="PicDesc" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group form-inline">
+                        <label asp-for="Remark" class="control-label col-md-3">Remark</label>
+                        <div class="col-md-9">
+                            <textarea asp-for="Remark" class="form-control" cols="40"></textarea>
+                            <span asp-validation-for="Remark" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group" style="text-align:right;">
+                    <input type="submit" value="save" class="btn btn-success" />
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                </div>
+            }
+        </div>
+        <div class="modal-footer">
+        </div>
+    </div>
+</div>

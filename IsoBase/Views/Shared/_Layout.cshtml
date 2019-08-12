@@ -6,8 +6,8 @@
     <title>@ViewData["Title"] - IsoBase</title>
 
     @*====================================================== CSS ========================================================*@
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" 
-          integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" 
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css"
+          integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/"
           crossorigin="anonymous">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
           asp-fallback-href="~/lib/bootstrap/dist/css/bootstrap.min.css"
@@ -19,6 +19,7 @@
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/dataTables.jqueryui.min.css">
     <link rel="stylesheet" href="~/css/site.css" />
 
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/1.5.6/css/buttons.jqueryui.min.css" />
     @*======================================================JAVASCRIPT========================================================*@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"
@@ -37,6 +38,19 @@
     <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.10.19/js/dataTables.jqueryui.min.js"></script>
     <script src="https://cdn.datatables.net/fixedcolumns/3.2.6/js/dataTables.fixedColumns.min.js"></script>
+
+
+    @*======================================================BUTTON========================================================*@
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jszip/2.5.0/jszip.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
+    @*<script type="text/javascript" src="https://cdn.datatables.net/1.10.18/js/jquery.dataTables.min.js"></script>*@
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.6/js/dataTables.buttons.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.6/js/buttons.colVis.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.6/js/buttons.flash.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.6/js/buttons.html5.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.6/js/buttons.print.min.js"></script>
+
 
 </head>
 <body>
@@ -64,8 +78,12 @@
                                 <li><a class="nav-link text-dark" asp-area="" asp-controller="Kalender" asp-action="Index">Kalender</a></li>
                             </ul>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Client" asp-action="Index">ClientMaster</a>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link text-dark dropdown-toggle" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Client</a>
+                            <ul class="dropdown-menu">
+                                <li><a class="nav-link text-dark" asp-area="" asp-controller="Client" asp-action="Index">Client List</a></li>
+                                <li><a class="nav-link text-dark" asp-area="" asp-controller="PicCode" asp-action="Index">PicCode</a></li>
+                            </ul>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="ClientType" asp-action="Index">ClientType</a>
@@ -92,5 +110,6 @@
     </footer>
 
     @RenderSection("Scripts", required: false)
+    <div id="myModal" class="modal fade" role="dialog"></div>
 </body>
 </html>

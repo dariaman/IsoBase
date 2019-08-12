@@ -88,7 +88,7 @@ namespace IsoBase.Data
         public DataTable ListData()
         {
             var conn = (SqlConnection)_context.Database.GetDbConnection().CreateCommand().Connection;
-            string queryString = this.GenerateQueryData();
+            string queryString = this.GenerateQueryString();
             DataTable dt = new DataTable();
             SqlDataAdapter da = new SqlDataAdapter(queryString, conn);
             da.Fill(dt);
@@ -130,7 +130,7 @@ namespace IsoBase.Data
         /*
          * Hanya untuk menggabungkan string dalam bentuk query
          */
-        string GenerateQueryData()
+        public string GenerateQueryString()
         {
             string Offset = string.Format(" OFFSET {0} ROWS FETCH NEXT {1} ROWS ONLY ", this.RowStart, this.RowLength);
             string query = string.Concat(this.select, this.Tabel, FilterWhereString, this.OrderKolom, Offset);

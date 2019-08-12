@@ -26,7 +26,6 @@ namespace IsoBase.Controllers
             return View();
         }
 
-
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult ListClientAll([DataTablesRequest] DataTablesRequest dataRequest)
