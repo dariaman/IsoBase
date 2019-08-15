@@ -11,6 +11,9 @@
     tr > th > input[type=text]:first-child {
         width: 100%;
     }
+    tr.table-danger{
+        font-weight:bold;
+    }
 </style>
 
 <table id="myTable" class="display cell-border">
@@ -83,15 +86,8 @@
                 { data: "lastUpdate" },
             ],
             createdRow: function (row, data, index) {
-                //
-                // if the second column cell is blank apply special formatting
-                //
                 if (data.isHoliday == "Yes") {
-                    $(row).addClass('p-3 mb-2 bg-danger text-white');
-                    //$(row).find("td.sorting_1").removeClass("sorting_1");
-                    //$(row).find('td').removeClass('sorting_1');
-                    //$(row).find("td").removeAttr('class');
-                    //$('td.sorting_1', row).eq(0).removeClass();
+                    $(row).addClass('table-danger');
                 }
             }
 // ====================================================END CONFIG KOLOM DATA==============================================================

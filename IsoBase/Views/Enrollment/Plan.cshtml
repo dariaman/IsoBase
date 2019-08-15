@@ -307,57 +307,36 @@
 
         // Table Plan
         var tableplan = $('#tableplan').DataTable();
-        tableplan.columns().every(function () {
+        // Apply the search
+        tableplan.columns().every( function () {
             var that = this;
-            $('input', this.footer()).on( 'keypress keyup change', function (e) {
-                tableplan.search( this.value ).draw();
+            $( 'input', this.footer() ).on( 'keyup change clear', function () {
+                if ( that.search() !== this.value ) {
+                    that.search(this.value).draw();
+                }
             });
         });
-        $('#tableplan tbody').on('click', 'tr', function () {
-            if ($(this).hasClass('selected')) {
-                $(this).removeClass('selected');
-            }
-            else {
-                tableplan.$('tr.selected').removeClass('selected');
-                $(this).addClass('selected');
-            }
-        });
+        
         // table Cov
         var tablecov = $('#tablecov').DataTable();
-        tablecov.columns().every(function () {
+        tablecov.columns().every( function () {
             var that = this;
-            $('input', this.footer()).on( 'keypress keyup change', function (e) {
-                tablecov.search( this.value ).draw();
+            $( 'input', this.footer() ).on( 'keyup change clear', function () {
+                if ( that.search() !== this.value ) {
+                    that.search(this.value).draw();
+                }
             });
-        });
-        $('#tablecov tbody').on('click', 'tr', function () {
-            if ($(this).hasClass('selected')) {
-                $(this).removeClass('selected');
-            }
-            else {
-                tablecov.$('tr.selected').removeClass('selected');
-                $(this).addClass('selected');
-            }
         });
 
         // Table Benefit
         var tableBenf = $('#tablebenf').DataTable();
-        tableBenf.columns().every(function () {
+        tableBenf.columns().every( function () {
             var that = this;
-            $('input', this.footer()).on( 'keypress keyup change', function (e) {
-                tableBenf.search( this.value ).draw();
+            $( 'input', this.footer() ).on( 'keyup change clear', function () {
+                if ( that.search() !== this.value ) {
+                    that.search(this.value).draw();
+                }
             });
         });
-        $('#tablebenf tbody').on('click', 'tr', function () {
-            if ($(this).hasClass('selected')) {
-                $(this).removeClass('selected');
-            }
-            else {
-                tableBenf.$('tr.selected').removeClass('selected');
-                $(this).addClass('selected');
-            }
-        });
-
-        
     });
 </script>

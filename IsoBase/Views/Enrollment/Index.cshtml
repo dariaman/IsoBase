@@ -39,11 +39,14 @@
     </tfoot>
 </table>
 
+<script src="~/js/site.js"></script>
 <script>
     $(document).ready(function () {
         $('#myTable').dataTable({
             "jQueryUI": true,
             buttons: [],
+            serverSide: true,
+            processing: true,
             initComplete: function () {
                 var r = $('#myTable tfoot tr');
                 $('#myTable thead').append(r);
