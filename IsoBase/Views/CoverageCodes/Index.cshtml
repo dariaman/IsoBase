@@ -15,10 +15,10 @@
 <table id="myTable" class="display cell-border">
     <thead class="ui-widget-header">
         <tr>
+            <th>No</th>
             <th>CoverageCodeID</th>
             <th>ShortName</th>
             <th>Description</th>
-
             <th>IsActive</th>
             <th>UserCreate</th>
             <th>DateCreate</th>
@@ -28,6 +28,7 @@
     </thead>
     <tfoot>
         <tr>
+            <th class="search"></th>
             <th class="search"></th>
             <th class="search"></th>
             <th class="search"></th>
@@ -41,13 +42,11 @@
     </tfoot>
 </table>
 
-<script src="~/js/site.js"></script>
 <script>
     $(document).ready(function () {
         $('#myTable').dataTable({
             "jQueryUI": true,
-            serverSide: true,
-            processing: true,
+            buttons: [],
             columnDefs: [
                 { width: '50px', targets: 0 }
             ],
@@ -56,27 +55,28 @@
                 var r = $('#myTable tfoot tr');
                 $('#myTable thead').append(r);
                 $('#search_0').css('text-align', 'center');
-                this.api().columns([3]).every(function () {
+                this.api().columns([4]).every(function () {
                     var column = this;
                     var select = $('<select><option value=""> ... </option></select>')
                         .appendTo($(column.footer()).empty())
                         .on('change', function () {
                             column.search(this.value).draw();
                         });
-                    select.append('<option value="1">Aktif</option>');
-                    select.append('<option value="0">InActive</option>');
+                    select.append('<option value="Active">Active</option>');
+                    select.append('<option value="InActive">InActive</option>');
                 });
             },
             dom: '<"top"B>tr<"bottom"ip>',
-            "ajax": $.fn.dataTable.pipeline( {
+            ajax: {
                 "url": "@Url.Action("ListCoverageCodesAll")",
+                "type": "POST",
                 data: {
-                     __RequestVerificationToken: '@GetAntiXsrfRequestToken()',
+                    __RequestVerificationToken: '@GetAntiXsrfRequestToken()',
                 },
-                pages: 5 // number of pages to cache
-            } ),
+            },
 // ====================================================KONFIG KOLOM DATA==============================================================
             columns: [
+                { data: null, "width": "5px", className: "dt-right",},
                 { data: "id", className: "dt-right" ,"width": "50px",},
                 { data: "shortName" },
                 { data: "description"},
@@ -85,6 +85,10 @@
                 { data: "dateCreate" },
                 { data: "userUpdate" },
                 { data: "dateUpdate" },
+            ],
+            "order": [[ 1, "asc" ]],
+            "columnDefs": [
+                    { "orderable": false, "targets": [0] },
             ]
 // ====================================================END CONFIG KOLOM DATA==============================================================
 
@@ -92,8 +96,14 @@
         });
         // DataTable
         var table = $('#myTable').DataTable();
+        /// Kolom No urut agar tidak ikut di berubah saat sorting
+        /// tidak berlaku untuk server side
+        table.on('order.dt search.dt', function () {
+            table.column(0, {search:'applied', order:'applied'}).nodes().each( function (cell, i) { cell.innerHTML = i+1; } );
+        }).draw();
+
         /* Apply the search for individual columns*/
-        $('#myTable tfoot th').filter(":eq(0),:eq(1),:eq(2)").each(function () {
+        $('#myTable tfoot th').filter(":eq(1),:eq(2),:eq(3),:eq(4)").each(function () {
             var title = $(this).text();
             $(this).html('<input type="text"  placeholder=" ... " />');
         });
@@ -106,11 +116,7 @@
                 }
             });
             $('input', this.footer()).on('keyup change', function (ev) {
-                if (ev.keyCode == 13) { //only on enter keypress (code 13)
-                    if (that.search() !== this.value) {
-                        that.search(this.value).draw();
-                    }
-                }
+                that.search(this.value).draw();
             });
         });
 

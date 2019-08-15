@@ -3,22 +3,23 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using IsoBase.Data;
 using IsoBase.Models;
 using DataTables.AspNetCore.Mvc.Binder;
-using System.Data;
+using Vereyon.Web;
 
 namespace IsoBase.Controllers
 {
     public class CoverageCodesController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly IFlashMessage flashMessage;
 
-        public CoverageCodesController(ApplicationDbContext context)
+        public CoverageCodesController(ApplicationDbContext context, IFlashMessage flash)
         {
             _context = context;
+            flashMessage = flash;
         }
 
         // GET: CoverageCodes
@@ -29,56 +30,21 @@ namespace IsoBase.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult ListCoverageCodesAll([DataTablesRequest] DataTablesRequest dataRequest)
+        public async Task<IActionResult> ListCoverageCodesAll([DataTablesRequest] DataTablesRequest dataRequest)
         {
-            var pgData = new PageData(dataRequest, _context)
-            {
-                select = @"SELECT ID,ShortName,Description,IsActive,UserCreate,DateCreate,UserUpdate,DateUpdate ",
-                Tabel = @" FROM CoverageCodes WITH(NOLOCK) WHERE 1=1 ",
-            };
-
-            //defenisikan Where condition
-            foreach (var req in dataRequest.Columns)
-            {
-                if (string.IsNullOrEmpty(req.SearchValue)) continue;
-                else if (req.Data == "id") pgData.AddWhereRegex(pgData.paternAngkaLike, req.SearchValue, "ID");
-                else if (req.Data == "shortName") pgData.AddWhereRegex(pgData.paternAngkaHurufLike, req.SearchValue, "ShortName");
-                else if (req.Data == "description") pgData.AddWhereRegex(pgData.paternAngkaHurufLike, req.SearchValue, "Description");
-                else if (req.Data == "isActive") pgData.AddWhereRegex(pgData.paternAngka, req.SearchValue, "IsActive");
-            }
-            pgData.CountData(); // hitung jlh total data dan total dataFilter
-
-            DataTable _dt = new DataTable();
+            var query = @"SELECT ID,ShortName,Description,CASE IsActive WHEN 1 THEN 'Active' ELSE 'Inactive' END IsActive,UserCreate,DateCreate,UserUpdate,DateUpdate FROM CoverageCodes WITH(NOLOCK) ";
+            var ls = new List<CoverageCodesModel>();
             try
             {
-                _dt = pgData.ListData();
-            }
-            catch (Exception ex) { throw new Exception(ex.Message); }
-
-            List<CoverageCodesModel> ls = new List<CoverageCodesModel>();
-            try
-            {
-                foreach (DataRow row in _dt.Rows)
-                {
-                    ls.Add(new CoverageCodesModel
-                    {
-                        ID = (int)row["ID"],
-                        ShortName = row["ShortName"].ToString(),
-                        Description = row["Description"].ToString(),
-
-                        IsActive = (Boolean)row["IsActive"],
-                        UserCreate = row["UserCreate"].ToString(),
-                        DateCreate = (DateTime)row["DateCreate"],
-                        UserUpdate = row["UserUpdate"].ToString(),
-                        DateUpdate = row["DateUpdate"] == DBNull.Value ? (DateTime?)null : (DateTime?)row["DateUpdate"],
-                    });
-                };
+                ls = await _context.Set<CoverageCodesModel>().FromSql(query).ToListAsync();
             }
             catch (Exception ex)
             {
-                throw new Exception(ex.Message);
+                flashMessage.Danger("Error Paging CoverageCodes : " + ex.Message);
+                throw new Exception();
             }
-            return Json(ls.ToDataTablesResponse(dataRequest, pgData.recordsTotal, pgData.recordsFilterd));
+
+            return Json(ls.ToDataTablesResponse(dataRequest, ls.Count, ls.Count));
         }
 
         // GET: CoverageCodes/Details/5
