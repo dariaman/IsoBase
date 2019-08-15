@@ -1,4 +1,4 @@
-﻿@model IEnumerable<IsoBase.Models.ClientPicModel>
+﻿@model IEnumerable<IsoBase.Models.ClientAccBankModel>
 
 @{
     ViewData["Title"] = "Index";
@@ -16,30 +16,16 @@
                 @Html.DisplayNameFor(model => model.ClientID)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.PicCodeID)
+                @Html.DisplayNameFor(model => model.BankCode)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.PicName)
+                @Html.DisplayNameFor(model => model.AccountName)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.PicTitle)
+                @Html.DisplayNameFor(model => model.AccountNo)
             </th>
             <th>
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Phone)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.PhoneExt)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.HP)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Email)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Fax)
+                @Html.DisplayNameFor(model => model.Remark)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.IsActive)
@@ -66,30 +52,16 @@
                 @Html.DisplayFor(modelItem => item.ClientID)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.PicCodeID)
+                @Html.DisplayFor(modelItem => item.BankCode)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.PicName)
+                @Html.DisplayFor(modelItem => item.AccountName)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.PicTitle)
+                @Html.DisplayFor(modelItem => item.AccountNo)
             </td>
             <td>
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Phone)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.PhoneExt)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.HP)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Email)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Fax)
+                @Html.DisplayFor(modelItem => item.Remark)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.IsActive)

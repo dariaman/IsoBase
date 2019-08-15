@@ -7,20 +7,10 @@ namespace IsoBase.Models
     [Table("PlanUpload",Schema ="stg")]
     public class PlanUploadModel
     {
-        public PlanUploadModel()
-        {
-            RecType = "1";
-        }
-        public PlanUploadModel(int _clientID)
-        {
-            RecType = "1";
-            ClientID = _clientID;
-        }
         [Key]
         public int ID { get; set; }
         [Required]
-        public int ClientID { get; set; }
-        public string RecType { get; set; }
+        public int EnrollmentHdrID { get; set; }
         public string PayorCode { get; set; }
         public string PlanId { get; set; }
         public string CorpCode { get; set; }

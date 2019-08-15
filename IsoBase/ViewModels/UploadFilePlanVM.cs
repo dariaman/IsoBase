@@ -6,7 +6,7 @@ namespace IsoBase.ViewModels
     public class UploadFilePlanVM
     {
         [Required]
-        public int ID { get; set; }
+        public int ClientID { get; set; } // ClientID
         [Required]
         public IFormFile Fileupload { get; set; }
     }

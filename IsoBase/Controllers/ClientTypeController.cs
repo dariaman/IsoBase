@@ -31,17 +31,6 @@ namespace IsoBase.Controllers
         public IActionResult Get([DataTablesRequest] DataTablesRequest dataRequest)
         {
             IEnumerable<ClientModel> products = _context.ClientModel.Skip(dataRequest.Start).Take(dataRequest.Length);
-            int recordsTotal = 2000; // _context.Tabel1Model.Count();
-            //int recordsTotal = products.Count();
-            int recordsFilterd = 1000; // recordsTotal;
-
-            //if (!string.IsNullOrEmpty(dataRequest.Search?.Value))
-            //{
-            //    //products = products.Where(e => e.policyno.Contains(dataRequest.Search.Value));
-            //    recordsFilterd = products.Count();
-            //}
-            //products = products.Skip(dataRequest.Start).Take(dataRequest.Length);
-
             return Json(products
                 .Select(e => new
                 {
@@ -49,13 +38,7 @@ namespace IsoBase.Controllers
                     e.ClientCode,
                     e.Name
                 })
-                .ToDataTablesResponse(dataRequest, recordsTotal, recordsFilterd));
-            //return Json(new {
-            //    draw = dataRequest.Draw,
-            //    recordsTotal = products.Count(),
-            //    recordsFiltered = products.Count(),
-            //    data = products.Select(e => new {  Id = e.Id, Name = e.Name, Created = e.Created, Price = 10 })
-            //});
+                .ToDataTablesResponse(dataRequest, products.Count(), products.Count()));
         }
 
         // GET: ClientType/Details/5

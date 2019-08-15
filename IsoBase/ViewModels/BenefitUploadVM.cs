@@ -4,8 +4,6 @@ namespace IsoBase.ViewModels
     public class BenefitUploadVM
     {
         public int ID { get; set; }
-        public int ClientID { get; set; }
-        public string RecType { get; set; }
         public string PlanId { get; set; }
         public string CorpCode { get; set; }
         public string CoverageCode { get; set; }

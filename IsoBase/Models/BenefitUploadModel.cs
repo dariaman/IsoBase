@@ -7,20 +7,10 @@ namespace IsoBase.Models
     [Table("BenefitUpload", Schema = "stg")]
     public class BenefitUploadModel
     {
-        public BenefitUploadModel()
-        {
-            RecType = "3";
-        }
-        public BenefitUploadModel(int _clientID)
-        {
-            RecType = "3";
-            ClientID = _clientID;
-        }
         [Key]
         public int ID { get; set; }
         [Required]
-        public int ClientID { get; set; }
-        public string RecType { get; set; }
+        public int EnrollmentHdrID { get; set; }
         public string PlanId { get; set; }
         public string CorpCode { get; set; }
         public string CoverageCode { get; set; }

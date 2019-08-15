@@ -4,24 +4,20 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace IsoBase.Models
 {
-    [Table("ClientPic")]
-    public class ClientPicModel
+    [Table("ClientAccBank")]
+    public class ClientAccBankModel
     {
         [Key]
         public int ID { get; set; }
         [Required]
         public int ClientID { get; set; }
         [Required]
-        public int PicCodeID { get; set; }
+        public string BankCode { get; set; }
         [Required]
-        public string PicName { get; set; }
+        public string AccountName { get; set; }
         [Required]
-        public string PicTitle { get; set; }
-        public string Phone { get; set; }
-        public string PhoneExt { get; set; }
-        public string HP { get; set; }
-        public string Email { get; set; }
-        public string Fax { get; set; }
+        public string AccountNo { get; set; }
+        public string Remark { get; set; }
 
         public Boolean IsActive { get; set; }
         public string UserCreate { get; set; }

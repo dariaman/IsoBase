@@ -10,16 +10,19 @@ using DataTables.AspNetCore.Mvc.Binder;
 using System.Data;
 using IsoBase.ViewModels;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Vereyon.Web;
 
 namespace IsoBase.Controllers
 {
     public class ClientController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly IFlashMessage flashMessage;
 
-        public ClientController(ApplicationDbContext context)
+        public ClientController(ApplicationDbContext context, IFlashMessage flash)
         {
             _context = context;
+            flashMessage = flash;
         }
 
         public IActionResult Index()
@@ -29,12 +32,13 @@ namespace IsoBase.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult ListClientAll([DataTablesRequest] DataTablesRequest dataRequest)
+        public async Task<IActionResult> ListClientAll([DataTablesRequest] DataTablesRequest dataRequest)
         {
             var pgData = new PageData(dataRequest, _context)
             {
-                select = @"SELECT cm.ID,cm.ClientCode,cm.Name ClientName,cm.ClientTypeID,ct.Name ClientTypeName,
-                            cm.IsActive,cm.DateCreate,cm.UserCreate,ct.DateUpdate,ct.UserUpdate ",
+                select = @"SELECT cm.ID ClientID,cm.ClientCode,cm.Name ClientName,cm.ClientTypeID,
+                            cm.IsActive,cm.UserCreate,cm.DateCreate,ct.UserUpdate,ct.DateUpdate,
+                            cm.Building,cm.Address,cm.Phone,cm.Fax,cm.Email,ct.Name ClientTypeName ",
                 Tabel = @" FROM Client cm WITH(NOLOCK)
                             INNER JOIN dbo.ClientType ct WITH(NOLOCK) ON ct.ID = cm.ClientTypeID
                             WHERE 1=1 ",
@@ -50,54 +54,56 @@ namespace IsoBase.Controllers
                 else if (req.Data == "clientTypeName") pgData.AddWhereRegex(pgData.paternAngka, req.SearchValue, "cm.ClientTypeID");
                 else if (req.Data == "isActive") pgData.AddWhereRegex(pgData.paternAngka, req.SearchValue, "cm.IsActive");
             }
-            pgData.CountData(); // hitung jlh total data dan total dataFilter
-
-            DataTable _dt = new DataTable();
-            try
-            {
-                _dt = pgData.ListData();
-            }
-            catch (Exception ex) { throw new Exception(ex.Message); }
 
             List<ClientListVM> ls = new List<ClientListVM>();
             try
             {
-                foreach (DataRow row in _dt.Rows)
-                {
-                    ls.Add(new ClientListVM
-                    {
-                        ClientID = row["ID"].ToString(),
-                        ClientCode = row["ClientCode"].ToString(),
-                        ClientName = row["ClientName"].ToString(),
-                        ClientTypeName = row["ClientTypeName"].ToString(),
-                        IsActive = row["IsActive"].ToString(),
-                        UserCreate = row["UserCreate"].ToString(),
-                        DateCreate = row["DateCreate"].ToString(),
-                        UserUpdate = row["UserUpdate"].ToString(),
-                        DateUpdate = row["DateUpdate"].ToString(),
-                    });
-                };
+                pgData.CountData(); // hitung jlh total data dan total dataFilter
+                ls = await _context.Set<ClientListVM>().FromSql(pgData.GenerateQueryString()).ToListAsync();
             }
             catch (Exception ex)
             {
-                throw new Exception(ex.Message);
+                flashMessage.Danger("Error ListClientAll : " + ex.Message);
             }
+
             return Json(ls.ToDataTablesResponse(dataRequest, pgData.recordsTotal, pgData.recordsFilterd));
         }
 
         // GET: ClientMaster/Details/5
-        public async Task<IActionResult> Details(int? id)
+        public async Task<IActionResult> Details(string id)
         {
-            if (id == null) { return NotFound(); }
-
-            var clientMasterModels = await _context.ClientModel
-                .FirstOrDefaultAsync(m => m.ID == id);
-            if (clientMasterModels == null)
+            int ClientID = 0;
+            ClientDetailVM cdvm = new ClientDetailVM();
+            var clientMasterModels = new ClientModel();
+            try
             {
-                return NotFound();
+                if (id == null) throw new Exception();
+                if (!int.TryParse(id, out ClientID)) throw new Exception();
+                if (!(ClientID > 0)) throw new Exception();
+                clientMasterModels = await _context.ClientModel.FirstOrDefaultAsync(m => m.ID == ClientID);
+                if (clientMasterModels == null) throw new Exception();
+            }
+            catch (Exception)
+            {
+                flashMessage.Danger("Invalid ClientID {" + id + "}");
+                throw new Exception();
             }
 
-            return View(clientMasterModels);
+            cdvm.ClientData = clientMasterModels;
+            try
+            {
+                var _pic = await _context.ClientPicModel.Where(x => x.ClientID == ClientID).ToListAsync();
+                var _Acc = await _context.ClientAccBankModel.Where(x => x.ClientID == ClientID).ToListAsync();
+                cdvm.PicList = _pic;
+                cdvm.AccBankList = _Acc;
+            }
+            catch (Exception ex)
+            {
+                flashMessage.Danger(ex.Message);
+                throw new Exception();
+            }
+            
+            return View();
         }
 
 
@@ -110,7 +116,6 @@ namespace IsoBase.Controllers
                 Text = u.Name,
                 Value = u.ID.ToString()
             });
-
 
             return View();
         }

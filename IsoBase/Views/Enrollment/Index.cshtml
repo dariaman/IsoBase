@@ -17,8 +17,11 @@
         <tr>
             <th>No</th>
             <th>ClientID</th>
-            <th>ClientCode</th>
-            <th>ClientName</th>
+            <th>Client Code</th>
+            <th>Client Name</th>
+            <th>Client Type</th>
+            <th>Building</th>
+            <th>Address</th>
             <th>Action</th>
         </tr>
     </thead>
@@ -29,22 +32,33 @@
             <th class="search"></th>
             <th class="search"></th>
             <th class="search"></th>
+            <th class="search"></th>
+            <th class="search"></th>
+            <th class="search"></th>
         </tr>
     </tfoot>
 </table>
 
-<script src="~/js/site.js"></script>
 <script>
     $(document).ready(function () {
         $('#myTable').dataTable({
             "jQueryUI": true,
             buttons: [],
-            serverSide: true,
-            processing: true,
             initComplete: function () {
                 var r = $('#myTable tfoot tr');
                 $('#myTable thead').append(r);
                 $('#search_0').css('text-align', 'center');
+
+                this.api().columns([4]).every(function () {
+                    var column = this;
+                    var select = $('<select><option value=""> ... </option></select>')
+                        .appendTo($(column.footer()).empty())
+                        .on('change', function () {
+                            column.search(this.value).draw();
+                        });
+                    select.append('<option value="1">Insurance</option>');
+                    select.append('<option value="2">ASO</option>');
+                });
             },
             dom: '<"top"B>tr<"bottom"ip>',
             "ajax": $.fn.dataTable.pipeline( {
@@ -56,22 +70,26 @@
             } ),
 // ====================================================KONFIG KOLOM DATA==============================================================
             columns: [
-                { data: "No","width": "5px",className: "dt-right",
+                { data: null,"width": "5px",className: "dt-right",
                     render: function (data, type, row, meta) { return meta.row + meta.settings._iDisplayStart + 1; }
                 },
                 { data: "clientID" },
                 { data: "clientCode" },
                 { data: "clientName" },
-                { data: "clientID",className: "dt-center" ,"width": "10px",
+                { data: "clientTypeName" },
+                { data: "building" },
+                { data: "address" },
+                {
+                    data: null, className: "dt-center", "width": "10px",
                     render: function (data, type, row, meta) {
-                        return '<a href="@Url.Action("Member")?ClientID=' + data + '"><i class="fas fa-id-card-alt fa-lg" title="Enroll Member"></i></a> &nbsp;&nbsp;' + 
-                            ' <a href="@Url.Action("Plan")?ClientID=' + data + '"><i class="fas fa-notes-medical fa-lg text-success" title="Enroll Plan"></i></a>';
+                        return '<a href="@Url.Action("Member")?ClientID=' + data.clientID + '"><i class="fas fa-id-card-alt fa-lg" title="Enroll Member"></i></a> &nbsp;&nbsp;' + 
+                            ' <a href="@Url.Action("Plan")?ClientID=' + data.clientID + '"><i class="fas fa-notes-medical fa-lg text-success" title="Enroll Plan"></i></a>';
                     }
                 },
             ],
             "order": [[ 1, "asc" ]],
             "columnDefs": [
-                { "orderable": false, "targets": [0, 3] },
+                { "orderable": false, "targets": [0, 7] },
             ]
 // ====================================================END CONFIG KOLOM DATA==============================================================
 
@@ -80,7 +98,7 @@
         // DataTable
         var table = $('#myTable').DataTable();
         /* Apply the search for individual columns*/
-        $('#myTable tfoot th').filter(":eq(1),:eq(2)").each(function () {
+        $('#myTable tfoot th').filter(":eq(1),:eq(2),:eq(3),:eq(4),:eq(5),:eq(6)").each(function () {
             var title = $(this).text();
             $(this).html('<input type="text"  placeholder=" ... " />');
         });

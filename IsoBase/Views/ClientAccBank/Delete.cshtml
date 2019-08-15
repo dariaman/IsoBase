@@ -1,13 +1,14 @@
-﻿@model IsoBase.Models.ClientPicModel
+﻿@model IsoBase.Models.ClientAccBankModel
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Delete";
 }
 
-<h1>Details</h1>
+<h1>Delete</h1>
 
+<h3>Are you sure you want to delete this?</h3>
 <div>
-    <h4>ClientPicModel</h4>
+    <h4>ClientAccBankModel</h4>
     <hr />
     <dl class="row">
         <dt class = "col-sm-2">
@@ -17,56 +18,28 @@
             @Html.DisplayFor(model => model.ClientID)
         </dd>
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.PicCodeID)
+            @Html.DisplayNameFor(model => model.BankCode)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.PicCodeID)
+            @Html.DisplayFor(model => model.BankCode)
         </dd>
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.PicName)
+            @Html.DisplayNameFor(model => model.AccountName)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.PicName)
+            @Html.DisplayFor(model => model.AccountName)
         </dd>
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.PicTitle)
+            @Html.DisplayNameFor(model => model.AccountNo)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.PicTitle)
+            @Html.DisplayFor(model => model.AccountNo)
         </dd>
         <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Remark)
         </dt>
         <dd class = "col-sm-10">
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Phone)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Phone)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.PhoneExt)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.PhoneExt)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.HP)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.HP)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Email)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Email)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Fax)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Fax)
+            @Html.DisplayFor(model => model.Remark)
         </dd>
         <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.IsActive)
@@ -99,8 +72,10 @@
             @Html.DisplayFor(model => model.DateUpdate)
         </dd>
     </dl>
-</div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model.ID">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+    
+    <form asp-action="Delete">
+        <input type="hidden" asp-for="ID" />
+        <input type="submit" value="Delete" class="btn btn-danger" /> |
+        <a asp-action="Index">Back to List</a>
+    </form>
 </div>

@@ -1,4 +1,4 @@
-﻿@model IsoBase.Models.ClientPicModel
+﻿@model IsoBase.Models.ClientAccBankModel
 
 @{
     ViewData["Title"] = "Create";
@@ -6,7 +6,7 @@
 
 <h1>Create</h1>
 
-<h4>ClientPicModel</h4>
+<h4>ClientAccBankModel</h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
@@ -18,44 +18,24 @@
                 <span asp-validation-for="ClientID" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="PicCodeID" class="control-label"></label>
-                <input asp-for="PicCodeID" class="form-control" />
-                <span asp-validation-for="PicCodeID" class="text-danger"></span>
+                <label asp-for="BankCode" class="control-label"></label>
+                <input asp-for="BankCode" class="form-control" />
+                <span asp-validation-for="BankCode" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="PicName" class="control-label"></label>
-                <input asp-for="PicName" class="form-control" />
-                <span asp-validation-for="PicName" class="text-danger"></span>
+                <label asp-for="AccountName" class="control-label"></label>
+                <input asp-for="AccountName" class="form-control" />
+                <span asp-validation-for="AccountName" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="PicTitle" class="control-label"></label>
-                <input asp-for="PicTitle" class="form-control" />
-                <span asp-validation-for="PicTitle" class="text-danger"></span>
+                <label asp-for="AccountNo" class="control-label"></label>
+                <input asp-for="AccountNo" class="form-control" />
+                <span asp-validation-for="AccountNo" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Phone" class="control-label"></label>
-                <input asp-for="Phone" class="form-control" />
-                <span asp-validation-for="Phone" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="PhoneExt" class="control-label"></label>
-                <input asp-for="PhoneExt" class="form-control" />
-                <span asp-validation-for="PhoneExt" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="HP" class="control-label"></label>
-                <input asp-for="HP" class="form-control" />
-                <span asp-validation-for="HP" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Email" class="control-label"></label>
-                <input asp-for="Email" class="form-control" />
-                <span asp-validation-for="Email" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Fax" class="control-label"></label>
-                <input asp-for="Fax" class="form-control" />
-                <span asp-validation-for="Fax" class="text-danger"></span>
+                <label asp-for="Remark" class="control-label"></label>
+                <input asp-for="Remark" class="form-control" />
+                <span asp-validation-for="Remark" class="text-danger"></span>
             </div>
             <div class="form-group form-check">
                 <label class="form-check-label">

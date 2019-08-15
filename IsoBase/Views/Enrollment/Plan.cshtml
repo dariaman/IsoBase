@@ -1,7 +1,7 @@
-﻿@model IsoBase.Models.ClientModel
+﻿@model IsoBase.ViewModels.LastEnrollVM
 
 @{
-    ViewData["Title"] = "Upload Plan : " + Model.Name.ToUpper();
+    ViewData["Title"] = "Upload Plan : " + Model._clientModel.Name.ToUpper();
 }
 
 @inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Xsrf
@@ -165,7 +165,7 @@
             <!-- Modal body -->
             <div class="modal-body">
                 <form method="post" enctype="multipart/form-data" asp-action="UploadFilePlan">
-                    <input type="hidden" name="ID" asp-for="ID" value="@Model.ID" />
+                    <input type="hidden" name="ClientID" asp-for="_clientModel.ID"  value="@Model._clientModel.ID" />
                     <div class="form-group">
                         <div class="file-path-wrapper">
                             <input type="file" name="Fileupload" class="file-path validate">
@@ -182,6 +182,7 @@
 
 <script>
     $(document).ready(function () {
+        //=============Table Plan
         $('#tableplan').dataTable({
             "jQueryUI": true,
             buttons: [],
@@ -196,7 +197,7 @@
                 "type": "POST",
                 data: {
                     __RequestVerificationToken: '@GetAntiXsrfRequestToken()',
-                    "clientID":'@Model.ID.ToString()',
+                    "EnrollmentHdrID":'@Model.EnrollmentHdrModel.ID.ToString()',
                 },
             },
             columns: [
@@ -219,15 +220,11 @@
                 { data: "userUpload" },
                 { data: "errorMessage" },
             ],
-            //"order": [[ 1, "asc" ]],
-            //"columnDefs": [
-            //    { "orderable": false, "targets": [0, 3] },
-            //]
         });
-
+        //=============Table Coverage
         $('#tablecov').dataTable({
             "jQueryUI": true,
-            //processing: true,
+            buttons: [],
             initComplete: function () {
                 var r = $('#tablecov tfoot tr');
                 $('#tablecov thead').append(r);
@@ -239,7 +236,7 @@
                 "type": "POST",
                 data: {
                     __RequestVerificationToken: '@GetAntiXsrfRequestToken()',
-                    "clientID":'@Model.ID.ToString()',
+                    "EnrollmentHdrID":'@Model.EnrollmentHdrModel.ID.ToString()',
                 },
             },
             columns: [
@@ -256,15 +253,11 @@
                 { data: "userUpload" },
                 { data: "errorMessage" },
             ],
-            //"order": [[ 1, "asc" ]],
-            //"columnDefs": [
-            //    { "orderable": false, "targets": [0, 3] },
-            //]
         });
-
+        //=============Table Benefit
         $('#tablebenf').dataTable({
             "jQueryUI": true,
-            //processing: true,
+            buttons: [],
             initComplete: function () {
                 var r = $('#tablebenf tfoot tr');
                 $('#tablebenf thead').append(r);
@@ -276,7 +269,7 @@
                 "type": "POST",
                 data: {
                     __RequestVerificationToken: '@GetAntiXsrfRequestToken()',
-                    "clientID":'@Model.ID.ToString()',
+                    "EnrollmentHdrID":'@Model.EnrollmentHdrModel.ID.ToString()',
                 },
             },
             columns: [
@@ -296,10 +289,6 @@
                 { data: "userUpload" },
                 { data: "errorMessage" },
             ],
-            //"order": [[ 1, "asc" ]],
-            //"columnDefs": [
-            //    { "orderable": false, "targets": [0, 3] },
-            //]
         });
 
         /* Apply the search for individual columns*/
@@ -320,17 +309,8 @@
         var tableplan = $('#tableplan').DataTable();
         tableplan.columns().every(function () {
             var that = this;
-            $('input', this.footer()).on('focusout', function () {
-                if (that.search() !== this.value) {
-                    that.search(this.value).draw();
-                }
-            });
-            $('input', this.footer()).on('keyup change', function (ev) {
-                if (ev.keyCode == 13) { //only on enter keypress (code 13)
-                    if (that.search() !== this.value) {
-                        that.search(this.value).draw();
-                    }
-                }
+            $('input', this.footer()).on( 'keypress keyup change', function (e) {
+                tableplan.search( this.value ).draw();
             });
         });
         $('#tableplan tbody').on('click', 'tr', function () {
@@ -346,17 +326,8 @@
         var tablecov = $('#tablecov').DataTable();
         tablecov.columns().every(function () {
             var that = this;
-            $('input', this.footer()).on('focusout', function () {
-                if (that.search() !== this.value) {
-                    that.search(this.value).draw();
-                }
-            });
-            $('input', this.footer()).on('keyup change', function (ev) {
-                if (ev.keyCode == 13) { //only on enter keypress (code 13)
-                    if (that.search() !== this.value) {
-                        that.search(this.value).draw();
-                    }
-                }
+            $('input', this.footer()).on( 'keypress keyup change', function (e) {
+                tablecov.search( this.value ).draw();
             });
         });
         $('#tablecov tbody').on('click', 'tr', function () {
@@ -373,17 +344,8 @@
         var tableBenf = $('#tablebenf').DataTable();
         tableBenf.columns().every(function () {
             var that = this;
-            $('input', this.footer()).on('focusout', function () {
-                if (that.search() !== this.value) {
-                    that.search(this.value).draw();
-                }
-            });
-            $('input', this.footer()).on('keyup change', function (ev) {
-                if (ev.keyCode == 13) { //only on enter keypress (code 13)
-                    if (that.search() !== this.value) {
-                        that.search(this.value).draw();
-                    }
-                }
+            $('input', this.footer()).on( 'keypress keyup change', function (e) {
+                tableBenf.search( this.value ).draw();
             });
         });
         $('#tablebenf tbody').on('click', 'tr', function () {

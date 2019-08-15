@@ -4,18 +4,22 @@ using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using IsoBase.Data;
 using IsoBase.Models;
-using System.Data;
 using DataTables.AspNetCore.Mvc.Binder;
+using Microsoft.EntityFrameworkCore;
+using System.Threading.Tasks;
+using Vereyon.Web;
 
 namespace IsoBase.Controllers
 {
     public class FrequencyCodesController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly IFlashMessage flashMessage;
 
-        public FrequencyCodesController(ApplicationDbContext context)
+        public FrequencyCodesController(ApplicationDbContext context, IFlashMessage flash)
         {
             _context = context;
+            flashMessage = flash;
         }
 
         // GET: FrequencyCodes
@@ -26,54 +30,22 @@ namespace IsoBase.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult ListFrequencyCodeAll([DataTablesRequest] DataTablesRequest dataRequest)
+        public async Task<IActionResult> ListFrequencyCodeAll([DataTablesRequest] DataTablesRequest dataRequest)
         {
-            var pgData = new PageData(dataRequest, _context)
-            {
-                select = @"SELECT ID,Description,IsActive,UserCreate,DateCreate,UserUpdate,DateUpdate ",
-                Tabel = @" FROM FrequencyCodes WITH(NOLOCK) WHERE 1=1 ",
-            };
+            var query = @"SELECT ID,Description,CASE IsActive WHEN 1 THEN 'Active' ELSE 'Inactive' END IsActive,UserCreate,DateCreate,UserUpdate,DateUpdate FROM FrequencyCodes WITH(NOLOCK) ";
+            var ls = new List<FrequencyCodesModel>();
 
-            //defenisikan Where condition
-            foreach (var req in dataRequest.Columns)
-            {
-                if (string.IsNullOrEmpty(req.SearchValue)) continue;
-                else if (req.Data == "id") pgData.AddWhereRegex(pgData.paternAngkaLike, req.SearchValue, "ID");
-                else if (req.Data == "isActive") pgData.AddWhereRegex(pgData.paternAngka, req.SearchValue, "IsActive");
-                else if (req.Data == "description") pgData.AddWhereRegex(pgData.paternAngkaHurufLike, req.SearchValue, "Description");
-            }
-            pgData.CountData(); // hitung jlh total data dan total dataFilter
-
-            DataTable _dt = new DataTable();
             try
             {
-                _dt = pgData.ListData();
-            }
-            catch (Exception ex) { throw new Exception(ex.Message); }
-
-            List<FrequencyCodesModel> ls = new List<FrequencyCodesModel>();
-            try
-            {
-                foreach (DataRow row in _dt.Rows)
-                {
-                    ls.Add(new FrequencyCodesModel
-                    {
-                        ID = (int)row["ID"],
-                        Description = row["Description"].ToString(),
-
-                        IsActive = (Boolean)row["IsActive"],
-                        UserCreate = row["UserCreate"].ToString(),
-                        DateCreate = (DateTime)row["DateCreate"],
-                        UserUpdate = row["UserUpdate"].ToString(),
-                        DateUpdate = row["DateUpdate"] == DBNull.Value ? (DateTime?)null : (DateTime?)row["DateUpdate"],
-                    });
-                };
+                ls = await _context.Set<FrequencyCodesModel>().FromSql(query).ToListAsync();
             }
             catch (Exception ex)
             {
-                throw new Exception(ex.Message);
+                flashMessage.Danger("Error Paging FrequencyCode : " + ex.Message);
+                throw new Exception();
             }
-            return Json(ls.ToDataTablesResponse(dataRequest, pgData.recordsTotal, pgData.recordsFilterd));
+
+            return Json(ls.ToDataTablesResponse(dataRequest, ls.Count, ls.Count));
         }
 
 

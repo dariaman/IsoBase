@@ -60,7 +60,7 @@ namespace IsoBase.Data
 
         public void GenerateOrderColumn()
         {
-            foreach (var req in dataReq.Orders) OrderKolom = " ORDER BY " + string.Format(" {0} {1} ", (req.Column + 1).ToString(), req.Dir.ToUpper());
+            foreach (var req in dataReq.Orders) OrderKolom = " ORDER BY " + string.Format(" {0} {1} ", req.Column.ToString(), req.Dir.ToUpper());
         }
 
         /*
