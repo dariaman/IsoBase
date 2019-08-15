@@ -43,10 +43,6 @@
         $('#myTable').dataTable({
             "jQueryUI": true,
             buttons: [],
-            columnDefs: [
-                { width: '50px', targets: 0 }
-            ],
-            //fixedColumns: true,
             initComplete: function () {
                 var r = $('#myTable tfoot tr');
                 $('#myTable thead').append(r);

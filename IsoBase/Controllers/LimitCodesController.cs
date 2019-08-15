@@ -6,16 +6,21 @@ using IsoBase.Data;
 using IsoBase.Models;
 using DataTables.AspNetCore.Mvc.Binder;
 using System.Data;
+using Microsoft.EntityFrameworkCore;
+using System.Threading.Tasks;
+using Vereyon.Web;
 
 namespace IsoBase.Controllers
 {
     public class LimitCodesController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly IFlashMessage flashMessage;
 
-        public LimitCodesController(ApplicationDbContext context)
+        public LimitCodesController(ApplicationDbContext context, IFlashMessage flash)
         {
             _context = context;
+            flashMessage = flash;
         }
 
         // GET: LimitCodes
@@ -26,54 +31,22 @@ namespace IsoBase.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult ListLimitCodeAll([DataTablesRequest] DataTablesRequest dataRequest)
+        public async Task<IActionResult> ListLimitCodeAll([DataTablesRequest] DataTablesRequest dataRequest)
         {
-            var pgData = new PageData(dataRequest, _context)
-            {
-                select = @"SELECT ID,Description,IsActive,UserCreate,DateCreate,UserUpdate,DateUpdate ",
-                Tabel = @" FROM LimitCodes WITH(NOLOCK) WHERE 1=1 ",
-            };
+            var query = @"SELECT ID,Description,CASE IsActive WHEN 1 THEN 'Active' ELSE 'Inactive' END IsActive,UserCreate,DateCreate,UserUpdate,DateUpdate FROM LimitCodes WITH(NOLOCK) ";
+            var ls = new List<LimitCodesModel>();
 
-            //defenisikan Where condition
-            foreach (var req in dataRequest.Columns)
-            {
-                if (string.IsNullOrEmpty(req.SearchValue)) continue;
-                else if (req.Data == "id") pgData.AddWhereRegex(pgData.paternAngkaLike, req.SearchValue, "ID");
-                else if (req.Data == "isActive") pgData.AddWhereRegex(pgData.paternAngka, req.SearchValue, "IsActive");
-                else if (req.Data == "description") pgData.AddWhereRegex(pgData.paternAngkaHurufLike, req.SearchValue, "Description");
-            }
-            pgData.CountData(); // hitung jlh total data dan total dataFilter
-
-            DataTable _dt = new DataTable();
             try
             {
-                _dt = pgData.ListData();
-            }
-            catch (Exception ex) { throw new Exception(ex.Message); }
-
-            List<LimitCodesModel> ls = new List<LimitCodesModel>();
-            try
-            {
-                foreach (DataRow row in _dt.Rows)
-                {
-                    ls.Add(new LimitCodesModel
-                    {
-                        ID = (int)row["ID"],
-                        Description = row["Description"].ToString(),
-
-                        IsActive = (Boolean)row["IsActive"],
-                        UserCreate = row["UserCreate"].ToString(),
-                        DateCreate = (DateTime)row["DateCreate"],
-                        UserUpdate = row["UserUpdate"].ToString(),
-                        DateUpdate = row["DateUpdate"] == DBNull.Value ? (DateTime?)null : (DateTime?)row["DateUpdate"],
-                    });
-                };
+                ls = await _context.Set<LimitCodesModel>().FromSql(query).ToListAsync();
             }
             catch (Exception ex)
             {
-                throw new Exception(ex.Message);
+                flashMessage.Danger("Error Paging LimitCode : " + ex.Message);
+                throw new Exception();
             }
-            return Json(ls.ToDataTablesResponse(dataRequest, pgData.recordsTotal, pgData.recordsFilterd));
+
+            return Json(ls.ToDataTablesResponse(dataRequest, ls.Count, ls.Count));
         }
 
         // GET: LimitCodes/Details/5
