@@ -7,143 +7,51 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using IsoBase.Data;
 using IsoBase.Models;
+using DataTables.AspNetCore.Mvc.Binder;
+using Vereyon.Web;
+using IsoBase.ViewModels;
 
 namespace IsoBase.Controllers
 {
     public class KalenderController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly IFlashMessage flashMessage;
 
-        public KalenderController(ApplicationDbContext context)
+        public KalenderController(ApplicationDbContext context, IFlashMessage flash)
         {
             _context = context;
+            flashMessage = flash;
         }
 
         // GET: Kalender
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
-            return View(await _context.KalenderOperationalModel.ToListAsync());
+            return View();
         }
 
-        //// GET: Kalender/Details/5
-        //public async Task<IActionResult> Details(int? id)
-        //{
-        //    if (id == null)
-        //    {
-        //        return NotFound();
-        //    }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ListTglOperational([DataTablesRequest] DataTablesRequest dataRequest)
+        {
+            var query = @"SELECT ID,CONVERT(VARCHAR(30),Tgl) Tgl,DayNumMonth,DayNumYear,DayNameEn,DayNameInd,MonthYear,MonthNameEn,MonthNameInd,YearNumber,
+                        CASE IsHoliday WHEN 1 THEN 'Yes' ELSE 'No' END IsHoliday,COALESCE(DateCreate,DateUpdate) LastUpdate,COALESCE(UserCreate,UserUpdate) UserUpdate
+                        FROM dbo.KalenderOperational WITH(NOLOCK) ";
+            var ls = new List<KalenderVM>();
 
-        //    var kalenderOperationalModel = await _context.KalenderOperationalModel
-        //        .FirstOrDefaultAsync(m => m.ID == id);
-        //    if (kalenderOperationalModel == null)
-        //    {
-        //        return NotFound();
-        //    }
+            try
+            {
+                ls = await _context.Set<KalenderVM>().FromSql(query).ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                flashMessage.Danger("Error Paging ListTglOperational : " + ex.Message);
+                throw new Exception();
+            }
 
-        //    return View(kalenderOperationalModel);
-        //}
+            return Json(ls.ToDataTablesResponse(dataRequest, ls.Count, ls.Count));
+        }
 
-        //// GET: Kalender/Create
-        //public IActionResult Create()
-        //{
-        //    return View();
-        //}
-
-        //// POST: Kalender/Create
-        //// To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        //// more details see http://go.microsoft.com/fwlink/?LinkId=317598.
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public async Task<IActionResult> Create([Bind("ID,Tgl,DayNumMonth,DayNumYear,DayNameEn,DayNameInd,MonthYear,MonthNameEn,MonthNameInd,YearNumber,IsHoliday,UserCreate,DateCreate,UserUpdate,DateUpdate")] KalenderOperationalModel kalenderOperationalModel)
-        //{
-        //    if (ModelState.IsValid)
-        //    {
-        //        _context.Add(kalenderOperationalModel);
-        //        await _context.SaveChangesAsync();
-        //        return RedirectToAction(nameof(Index));
-        //    }
-        //    return View(kalenderOperationalModel);
-        //}
-
-        //// GET: Kalender/Edit/5
-        //public async Task<IActionResult> Edit(int? id)
-        //{
-        //    if (id == null)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    var kalenderOperationalModel = await _context.KalenderOperationalModel.FindAsync(id);
-        //    if (kalenderOperationalModel == null)
-        //    {
-        //        return NotFound();
-        //    }
-        //    return View(kalenderOperationalModel);
-        //}
-
-        //// POST: Kalender/Edit/5
-        //// To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        //// more details see http://go.microsoft.com/fwlink/?LinkId=317598.
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public async Task<IActionResult> Edit(int id, [Bind("ID,Tgl,DayNumMonth,DayNumYear,DayNameEn,DayNameInd,MonthYear,MonthNameEn,MonthNameInd,YearNumber,IsHoliday,UserCreate,DateCreate,UserUpdate,DateUpdate")] KalenderOperationalModel kalenderOperationalModel)
-        //{
-        //    if (id != kalenderOperationalModel.ID)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    if (ModelState.IsValid)
-        //    {
-        //        try
-        //        {
-        //            _context.Update(kalenderOperationalModel);
-        //            await _context.SaveChangesAsync();
-        //        }
-        //        catch (DbUpdateConcurrencyException)
-        //        {
-        //            if (!KalenderOperationalModelExists(kalenderOperationalModel.ID))
-        //            {
-        //                return NotFound();
-        //            }
-        //            else
-        //            {
-        //                throw;
-        //            }
-        //        }
-        //        return RedirectToAction(nameof(Index));
-        //    }
-        //    return View(kalenderOperationalModel);
-        //}
-
-        //// GET: Kalender/Delete/5
-        //public async Task<IActionResult> Delete(int? id)
-        //{
-        //    if (id == null)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    var kalenderOperationalModel = await _context.KalenderOperationalModel
-        //        .FirstOrDefaultAsync(m => m.ID == id);
-        //    if (kalenderOperationalModel == null)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    return View(kalenderOperationalModel);
-        //}
-
-        //// POST: Kalender/Delete/5
-        //[HttpPost, ActionName("Delete")]
-        //[ValidateAntiForgeryToken]
-        //public async Task<IActionResult> DeleteConfirmed(int id)
-        //{
-        //    var kalenderOperationalModel = await _context.KalenderOperationalModel.FindAsync(id);
-        //    _context.KalenderOperationalModel.Remove(kalenderOperationalModel);
-        //    await _context.SaveChangesAsync();
-        //    return RedirectToAction(nameof(Index));
-        //}
 
         private bool KalenderOperationalModelExists(int id)
         {

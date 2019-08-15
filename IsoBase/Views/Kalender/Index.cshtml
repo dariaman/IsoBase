@@ -1,113 +1,133 @@
 ﻿@model IEnumerable<IsoBase.Models.KalenderOperationalModel>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Kalender Operational";
 }
 
-<h1>Index</h1>
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Xsrf
+@functions{ public string GetAntiXsrfRequestToken() { return Xsrf.GetAndStoreTokens(Context).RequestToken; }}
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
+<style>
+    tr > th > input[type=text]:first-child {
+        width: 100%;
+    }
+</style>
+
+<table id="myTable" class="display cell-border">
+    <thead class="ui-widget-header">
         <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Tgl)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.DayNumMonth)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.DayNumYear)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.DayNameEn)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.DayNameInd)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.MonthYear)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.MonthNameEn)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.MonthNameInd)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.YearNumber)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.IsHoliday)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.UserCreate)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.DateCreate)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.UserUpdate)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.DateUpdate)
-            </th>
-            <th></th>
+            <th>Tgl</th>
+            <th>DayOfMonth</th>
+            <th>DayOfYear</th>
+            <th>DayNameEn</th>
+            <th>DayNameInd</th>
+            <th>MonthOfYear</th>
+            <th>MonthNameEn</th>
+            <th>MonthNameInd</th>
+            <th>Year</th>
+            <th>Holiday</th>
+            <th>UserUpdateBy</th>
+            <th>LastUpdateOn</th>
         </tr>
     </thead>
-    <tbody>
-@foreach (var item in Model) {
+    <tfoot>
         <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Tgl)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.DayNumMonth)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.DayNumYear)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.DayNameEn)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.DayNameInd)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.MonthYear)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.MonthNameEn)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.MonthNameInd)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.YearNumber)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.IsHoliday)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.UserCreate)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.DateCreate)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.UserUpdate)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.DateUpdate)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.ID">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.ID">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.ID">Delete</a>
-            </td>
+            <th class="search"></th>
+            <th class="search"></th>
+            <th class="search"></th>
+            <th class="search"></th>
+            <th class="search"></th>
+            <th class="search"></th>
+            <th class="search"></th>
+            <th class="search"></th>
+            <th class="search"></th>
+            <th class="search"></th>
+            <th class="search"></th>
+            <th class="search"></th>
         </tr>
-}
-    </tbody>
+    </tfoot>
 </table>
+
+<script>
+    $(document).ready(function () {
+        $('#myTable').dataTable({
+            "jQueryUI": true,
+            "orderClasses": false,
+            buttons: [],
+            initComplete: function () {
+                var r = $('#myTable tfoot tr');
+                $('#myTable thead').append(r);
+                $('#search_0').css('text-align', 'center');
+            },
+            dom: '<"top"B>tr<"bottom"ip>',
+            ajax: {
+                "url": "@Url.Action("ListTglOperational")",
+                "type": "POST",
+                data: {
+                    __RequestVerificationToken: '@GetAntiXsrfRequestToken()',
+                },
+            },
+// ====================================================KONFIG KOLOM DATA==============================================================
+            columns: [
+                { data: "tgl" },
+                { data: "dayNumMonth"},
+                { data: "dayNumYear" },
+                { data: "dayNameEn" },
+                { data: "dayNameInd" },
+                { data: "monthYear" },
+                { data: "monthNameEn" },
+                { data: "monthNameInd" },
+                { data: "yearNumber" },
+                { data: "isHoliday" },
+                { data: "userUpdate" },
+                { data: "lastUpdate" },
+            ],
+            createdRow: function (row, data, index) {
+                //
+                // if the second column cell is blank apply special formatting
+                //
+                if (data.isHoliday == "Yes") {
+                    $(row).addClass('p-3 mb-2 bg-danger text-white');
+                    //$(row).find("td.sorting_1").removeClass("sorting_1");
+                    //$(row).find('td').removeClass('sorting_1');
+                    //$(row).find("td").removeAttr('class');
+                    //$('td.sorting_1', row).eq(0).removeClass();
+                }
+            }
+// ====================================================END CONFIG KOLOM DATA==============================================================
+
+// ====================================================END DATATABLES Config==============================================================
+        });
+
+        // DataTable
+        var table = $('#myTable').DataTable();
+        /* Apply the search for individual columns*/
+        $('#myTable tfoot th').each(function () {
+            var title = $(this).text();
+            $(this).html('<input type="text"  placeholder=" ... " />');
+        });
+
+        table.columns().every(function () {
+            var that = this;
+            $('input', this.footer()).on('focusout', function () {
+                if (that.search() !== this.value) {
+                    that.search(this.value).draw();
+                }
+            });
+            $('input', this.footer()).on('keyup change', function (ev) {
+                that.search(this.value).draw();
+            });
+        });
+
+        $('#myTable tbody').on('click', 'tr', function () {
+            if ($(this).hasClass('selected')) {
+                $(this).removeClass('selected');
+            }
+            else {
+                table.$('tr.selected').removeClass('selected');
+                $(this).addClass('selected');
+            }
+        });
+
+    });
+</script>

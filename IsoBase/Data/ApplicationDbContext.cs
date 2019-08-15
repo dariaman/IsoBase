@@ -23,6 +23,7 @@ namespace IsoBase.Data
         public DbSet<BenefitUploadVM> BenefitUploadVM { get; set; }
         public DbSet<ClientListVM> ClientListVM { get; set; }
         public DbSet<EnrollmentVM> EnrollmentVM { get; set; }
+        public DbSet<KalenderVM> KalenderVM { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
