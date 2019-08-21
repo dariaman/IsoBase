@@ -24,7 +24,7 @@ namespace IsoBase.Extension
             DirPlanExcel = Configuration.GetValue<string>("FileSetting:FilePlanExcel");
         }
 
-        public async Task<FileStream> BackupFile(int StorageType, IFormFile Fileupload)
+        public async Task<string> BackupFile(int StorageType, IFormFile Fileupload)
         {
             /*
              * 1. direktori File Upload Plan Excel
@@ -37,11 +37,17 @@ namespace IsoBase.Extension
                     pathDir = this.DirPlanExcel;
                     break;
             }
-
-            var FullPath = Path.Combine(pathDir, Fileupload.FileName + RandomString(12));
-            var stream = new FileStream(FullPath, FileMode.Create);
-            await Fileupload.CopyToAsync(stream);
-            return stream;
+            string FullPath;
+            FileStream stream;
+            try
+            {
+                FullPath = Path.Combine(pathDir, Fileupload.FileName + RandomString(12));
+                stream = new FileStream(FullPath, FileMode.Create);
+                await Fileupload.CopyToAsync(stream);
+                stream.Close();
+            }
+            catch (Exception ex) { throw new Exception(ex.Message); }
+            return FullPath;
         }
 
         public static string RandomString(int length)

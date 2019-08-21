@@ -63,7 +63,8 @@ namespace IsoBase
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
             app.UseHsts();
-            app.UseExceptionHandler("/Home/Error");
+            app.UseDeveloperExceptionPage();
+            //app.UseExceptionHandler("/Home/Error");
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();

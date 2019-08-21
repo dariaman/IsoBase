@@ -7,10 +7,10 @@ namespace IsoBase.ViewModels
     {
         public LastEnrollVM()
         {
-            EnrollmentHdrModel = new EnrollmentHdrModel();
+            _enrollmentHdrVM = new EnrollmentHdrVM();
             _clientModel = new ClientModel();
         }
-        public EnrollmentHdrModel EnrollmentHdrModel { get; set; }
+        public EnrollmentHdrVM _enrollmentHdrVM { get; set; }
         public ClientModel _clientModel { get; set; }
     }
 }

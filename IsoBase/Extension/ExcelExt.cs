@@ -14,12 +14,12 @@ namespace IsoBase.Extension
 {
     public class ExcelExt
     {
-        FileStream _filestrm;
+        string _fullPathFileUpload;
         int _clientID;
 
-        public ExcelExt(FileStream Filestrm, int ClientID)
+        public ExcelExt(string  _fileupload, int ClientID)
         {
-            _filestrm = Filestrm;
+            _fullPathFileUpload = _fileupload;
             _clientID = ClientID;
         }
 
@@ -27,7 +27,8 @@ namespace IsoBase.Extension
         {
             //var evm = new EnrollPlanFileExcelDataVM();
             ExcelPackage package;
-            try { package = new ExcelPackage(this._filestrm); }
+            FileInfo _fileInfoUpload = new FileInfo(_fullPathFileUpload);
+            try { package = new ExcelPackage(_fileInfoUpload); }
             catch { throw new Exception("The file is not an valid Excel file. If the file is encrypted, please remove the password"); }
 
             if (package.Workbook.Worksheets.Count() < 3) throw new Exception("File must consist of 3 sheet (Plan,Coverage,Benefit)");
@@ -59,8 +60,8 @@ namespace IsoBase.Extension
                     .GetData(2, ws0.Dimension.Rows)
                     .ToList();
                 ws0.Dispose();
-                plans.RemoveAll(x => x == null);
-                plans.RemoveAll(x => string.IsNullOrWhiteSpace(x.PayorCode));
+                //plans.RemoveAll(x => x == null);
+                //plans.RemoveAll(x => string.IsNullOrWhiteSpace(x.PayorCode));
                 evm.PlanUploadModel = plans;
 
                 // Sheet 2 Coverage
@@ -80,8 +81,8 @@ namespace IsoBase.Extension
                     .GetData(2, ws0.Dimension.Rows)
                     .ToList();
                 ws0.Dispose();
-                covs.RemoveAll(x => x == null);
-                covs.RemoveAll(x => string.IsNullOrWhiteSpace(x.PlanId));
+                //covs.RemoveAll(x => x == null);
+                //covs.RemoveAll(x => string.IsNullOrWhiteSpace(x.PlanId));
                 evm.CoverageUploadModel = covs;
 
                 // Sheet 3 Benefit
@@ -102,8 +103,8 @@ namespace IsoBase.Extension
                     .WithProperty(p => p.MultipleCondition, "P")
                     .GetData(2, ws0.Dimension.Rows)
                     .ToList();
-                benfs.RemoveAll(x => x == null);
-                benfs.RemoveAll(x => string.IsNullOrWhiteSpace(x.PlanId));
+                //benfs.RemoveAll(x => x == null);
+                //benfs.RemoveAll(x => string.IsNullOrWhiteSpace(x.PlanId));
                 evm.BenefitUploadModel = benfs;
             }
             catch (Exception ex)
@@ -114,7 +115,7 @@ namespace IsoBase.Extension
             {
                 ws0.Dispose();
                 package.Dispose();
-                _filestrm.Dispose();
+                //_filestrm.Dispose();
             }
             return evm;
         }

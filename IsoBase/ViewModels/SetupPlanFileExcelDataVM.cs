@@ -8,6 +8,8 @@ namespace IsoBase.ViewModels
     {
         [Key]
         public int ClientID { get; set; }
+        public string ClientCode { get; set; }
+        public string StringPathFileUpload { get; set; }
         public List<PlanUploadModel> PlanUploadModel { get; set; }
         public List<CoverageUploadModel> CoverageUploadModel { get; set; }
         public List<BenefitUploadModel> BenefitUploadModel { get; set; }

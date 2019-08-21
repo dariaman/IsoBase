@@ -43,8 +43,8 @@
                         <th>MaxValue</th>
                         <th>FamilyMaxValue</th>
                         <th>PrintText</th>
-                        <th>UploadDate</th>
-                        <th>UserUpload</th>
+                        <th>UploadOn</th>
+                        <th>UploadBy</th>
                         <th>ErrorMessage</th>
                     </tr>
                 </thead>
@@ -197,7 +197,7 @@
                 "type": "POST",
                 data: {
                     __RequestVerificationToken: '@GetAntiXsrfRequestToken()',
-                    "EnrollmentHdrID":'@Model.EnrollmentHdrModel.ID.ToString()',
+                    "EnrollmentHdrID":'@Model._enrollmentHdrVM.ID.ToString()',
                 },
             },
             columns: [
@@ -220,6 +220,11 @@
                 { data: "userUpload" },
                 { data: "errorMessage" },
             ],
+            createdRow: function (row, data, index) {
+                if (data.errorMessage != "") {
+                    $(row).addClass('table-danger');
+                }
+            }
         });
         //=============Table Coverage
         $('#tablecov').dataTable({
@@ -236,7 +241,7 @@
                 "type": "POST",
                 data: {
                     __RequestVerificationToken: '@GetAntiXsrfRequestToken()',
-                    "EnrollmentHdrID":'@Model.EnrollmentHdrModel.ID.ToString()',
+                    "EnrollmentHdrID":'@Model._enrollmentHdrVM.ID.ToString()',
                 },
             },
             columns: [
@@ -253,6 +258,12 @@
                 { data: "userUpload" },
                 { data: "errorMessage" },
             ],
+            createdRow: function (row, data, index) {
+                if (data.errorMessage != "") {
+                    $(row).addClass('table-danger');
+                }
+            }
+            
         });
         //=============Table Benefit
         $('#tablebenf').dataTable({
@@ -269,7 +280,7 @@
                 "type": "POST",
                 data: {
                     __RequestVerificationToken: '@GetAntiXsrfRequestToken()',
-                    "EnrollmentHdrID":'@Model.EnrollmentHdrModel.ID.ToString()',
+                    "EnrollmentHdrID":'@Model._enrollmentHdrVM.ID.ToString()',
                 },
             },
             columns: [
@@ -289,6 +300,11 @@
                 { data: "userUpload" },
                 { data: "errorMessage" },
             ],
+            createdRow: function (row, data, index) {
+                if (data.errorMessage != "") {
+                    $(row).addClass('table-danger');
+                }
+            }
         });
 
         /* Apply the search for individual columns*/
@@ -337,6 +353,36 @@
                     that.search(this.value).draw();
                 }
             });
+        });
+
+        $('#tableplan tbody').on('click', 'tr', function () {
+            if ($(this).hasClass('selected')) {
+                $(this).removeClass('selected');
+            }
+            else {
+                tableplan.$('tr.selected').removeClass('selected');
+                $(this).addClass('selected');
+            }
+        });
+
+        $('#tablecov tbody').on('click', 'tr', function () {
+            if ($(this).hasClass('selected')) {
+                $(this).removeClass('selected');
+            }
+            else {
+                tablecov.$('tr.selected').removeClass('selected');
+                $(this).addClass('selected');
+            }
+        });
+
+        $('#tablebenf tbody').on('click', 'tr', function () {
+            if ($(this).hasClass('selected')) {
+                $(this).removeClass('selected');
+            }
+            else {
+                tableBenf.$('tr.selected').removeClass('selected');
+                $(this).addClass('selected');
+            }
         });
     });
 </script>
